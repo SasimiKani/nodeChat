@@ -1,0 +1,96 @@
+/* 全体のリセットと基本設定 */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f4f4f9;
+}
+
+/* アプリ全体を包むコンテナ */
+#container {
+    margin: 2rem auto;
+    max-width: 800px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* ユーザー情報表示部分 */
+#users {
+    padding: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+/* ユーザー名入力欄 */
+input[name="username"] {
+    margin: 1rem;
+    padding: 0.75rem;
+    font-size: 1.2rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: calc(100% - 2rem);
+}
+
+/* チャットメッセージ表示領域 */
+#response {
+    flex-grow: 1;
+    padding: 1rem;
+    background-color: #fafafa;
+    border-top: 1px solid #eee;
+    overflow-y: auto;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* メッセージ入力欄と送信ボタンを含むコンテナ */
+#messageContainer {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #fafafa;
+    border-top: 1px solid #eee;
+}
+
+/* メッセージ入力フィールド */
+input[name="text"] {
+    flex-grow: 1;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 1rem;
+}
+
+/* 送信ボタン */
+button[name="sendText"] {
+    padding: 0.75rem 1rem;
+    background-color: #28a745;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[name="sendText"]:hover {
+    background-color: #218838;
+}
+
+/* スクロールバーのスタイル（WebKit系ブラウザ） */
+#response::-webkit-scrollbar {
+    width: 8px;
+}
+
+#response::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
