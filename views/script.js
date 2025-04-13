@@ -33,13 +33,16 @@ function postRequestBody() {
 
 // メッセージ送信処理
 function sendText() {
+	const inputText = document.querySelector("input[name='text']")
+	if (inputText.value === "") return
+
 	const reqBody = postRequestBody()
 	let bodyObj = JSON.parse(reqBody.body)
-	bodyObj.text = document.querySelector("input[name='text']").value
+	bodyObj.text = inputText.value
 	reqBody.body = JSON.stringify(bodyObj)
 
 	// 入力欄をクリア
-	document.querySelector("input[name='text']").value = ""
+	inputText.value = ""
 
 	fetch("/sendText", reqBody)
 		.then(res => response(res))
