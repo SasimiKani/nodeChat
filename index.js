@@ -1,4 +1,6 @@
 const express = require("express")
+const multer = require("multer")
+const upload = multer()
 const http = require("http");				// HTTP サーバーを作成するために必要
 const { Server } = require("socket.io"); // socket.io の Server クラスをインポート
 const app = express()
@@ -38,17 +40,18 @@ const dataFormat = (rid=undefined) => {
 	return JSON.stringify(Array.from(chatData[rid]?.data)?.reverse())
 }
 
-const pushData = (reqData, rid=undefined) => {
+const pushData = (reqData, rid=undefined, files=undefined) => {
 	const date = new Date()
 	const hour = `00${date.getHours()}`.slice(-2)
 	const minute = `00${date.getMinutes()}`.slice(-2)
 	const time = `${hour}:${minute}`
-	/*data.push({
-		time: time,
-		info: reqData?.info,
-		name: reqData?.name,
-		text: reqData?.text
-	})*/
+	
+	if (files) {
+		files.forEach(file => {
+			console.log(file)
+		})
+	}
+	
 	chatData[rid]?.data?.push({
 		time: time,
 		info: reqData?.info,
@@ -72,9 +75,10 @@ app.post("/rename", (req, res) => {
 	pushData({name: req.body.name, info: "名前を変更"}, rid)
 	io.emit(`update${rid}`, dataFormat(rid));
 })
-app.post("/X", (req, res) => {
+app.post("/sendMedia", upload.any(), (req, res) => {
 	const rid = req.body.rid
-	pushData({name: req.body.name, info: "Xボタン押した"}, rid)
+	const files = req.files
+	pushData({name: req.body.name, info: "Xボタン押した"}, rid, files)
 	io.emit(`update${rid}`, dataFormat(rid));
 })
 app.post("/Y", (req, res) => {

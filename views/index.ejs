@@ -35,7 +35,15 @@
 		</div>
 		<div id="messageContainer">
 			<input autocomplete="off" name="text" placeholder="メッセージを入力" onkeydown="handleTextKeydown(event)">
+			<input type="file" name="file">
 			<button name="sendText" onclick="sendText()">
+				<!-- SVGアイコン -->
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" fill="white" stroke="white">
+					<title>send-variant-outline</title>
+					<path d="M3 20V4L22 12M5 17L16.85 12L5 7V10.5L11 12L5 13.5M5 17V7 13.5Z" />
+				</svg>
+			</button>
+			<button name="sendMedia" onclick="sendMedia()">
 				<!-- SVGアイコン -->
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" fill="white" stroke="white">
 					<title>send-variant-outline</title>

@@ -54,6 +54,25 @@ function sendText() {
 		.then(res => response(res))
 		.catch(err => console.error("エラー:", err))
 }
+// メディア送信処理
+function sendMedia() {
+	const inputFile = document.querySelector("input[name='file']")
+	const formData = new FormData()
+	console.log(inputFile.files)
+	if (inputFile.files === "") return
+
+	for (const file of Array.from(inputFile.files)) {
+		formData.append("files", file)
+	}
+	formData.append("rid", rid)
+
+	// 入力欄をクリア
+	inputFile.files = null
+
+	fetch("/sendMedia", {method: "POST", body: formData})
+		.then(res => response(res))
+		.catch(err => console.error("エラー:", err))
+}
 
 // ユーザー名変更（rename）処理
 function rename() {
