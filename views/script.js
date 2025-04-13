@@ -1,5 +1,10 @@
 // グローバル変数：socket
 let socket
+const rid = location.search.split("?")
+	?.map(param => param.split("="))
+	?.filter(param => param[0] === "rid")
+	?.at(0)?.at(1)
+document.querySelector("#rid").textContent = `ルーム：${decodeURIComponent(rid)}`
 
 // テキスト入力欄のEnterキーによる送信処理
 function handleTextKeydown(e) {
@@ -26,7 +31,8 @@ function postRequestBody() {
 			"Content-type": "application/json"
 		},
 		body: JSON.stringify({
-			name: document.querySelector("input[name='username']").value
+			name: document.querySelector("input[name='username']").value,
+			rid: rid
 		})
 	}
 }
@@ -61,17 +67,17 @@ function rename() {
 function connect(isRename = false) {
 	// ユーザー名取得／更新処理
 	if (isRename) {
-		localStorage["temp"] = localStorage["username"]
-		localStorage["username"] = ""
+		localStorage[`temp.${rid}`] = localStorage[`username.${rid}`]
+		localStorage[`username.${rid}`] = ""
 	}
-	let username = localStorage["username"]
+	let username = localStorage[`username.${rid}`]
 	while(!username) {
 		username = prompt("ユーザー名を入力してね")
 		if(isRename) {
-			localStorage["username"] = username || localStorage["temp"]
+			localStorage[`username.${rid}`] = username || localStorage[`temp.${rid}`]
 			if(!username) return false
 		}
-		localStorage["username"] = username
+		localStorage[`username.${rid}`] = username
 	}
 	document.querySelector("input[name='username']").value = username
 
@@ -83,7 +89,8 @@ function connect(isRename = false) {
 	// socket.io による接続開始（queryでユーザー名を送信）
 	socket = io({
 		query: {
-			username: username
+			username: username,
+			rid: rid
 		}
 	})
 
@@ -92,13 +99,13 @@ function connect(isRename = false) {
 	})
 
 	// サーバーからの更新イベント処理
-	socket.on("update", (data) => {
+	socket.on(`update${rid}`, (data) => {
 		const parsedData = JSON.parse(data)
 		updateResponseContainer(parsedData, username)
 	})
 
 	// サーバーからのユーザー数取得イベント処理
-	socket.on("getUsers", (data) => {
+	socket.on(`getUsers${rid}`, (data) => {
 		document.querySelector("#users").textContent = `部屋の人数：${data.length}人`
 	})
 

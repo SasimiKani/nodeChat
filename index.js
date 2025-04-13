@@ -11,18 +11,45 @@ app.use(express.json());
 // 'views'フォルダ内のファイルを静的コンテンツとして公開
 app.use(express.static(path.join(__dirname, "views")));
 
+let chatData = {}
 let data = []
 let users = []
-const dataFormat = () => {
-	return JSON.stringify(Array.from(data).reverse())
+
+const getParams = (req) => {
+	const query = req._parsedUrl.query
+	const params = new Object()
+	query?.split("&")?.forEach(param => {
+		const split = param?.split("=")
+		params[split[0]] = split[1]
+	})
+	if (!query) {
+		const split = query?.split("=")
+		params[split[0]] = split[1]
+	}
+	
+	return params
+}
+const getRid = (req) => {
+	const params = getParams(req)
+	return params?.rid
 }
 
-const pushData = (reqData) => {
+const dataFormat = (rid=undefined) => {
+	return JSON.stringify(Array.from(chatData[rid]?.data)?.reverse())
+}
+
+const pushData = (reqData, rid=undefined) => {
 	const date = new Date()
 	const hour = `00${date.getHours()}`.slice(-2)
 	const minute = `00${date.getMinutes()}`.slice(-2)
 	const time = `${hour}:${minute}`
-	data.push({
+	/*data.push({
+		time: time,
+		info: reqData?.info,
+		name: reqData?.name,
+		text: reqData?.text
+	})*/
+	chatData[rid]?.data?.push({
 		time: time,
 		info: reqData?.info,
 		name: reqData?.name,
@@ -36,24 +63,29 @@ app.get("/", (req, res) => {
 
 app.post("/sendText", (req, res) => {
 	console.log(req.body)
-	pushData({name: req.body.name, text: req.body.text})
-	io.emit("update", dataFormat());
+	const rid = req.body.rid
+	pushData({name: req.body.name, text: req.body.text}, rid)
+	io.emit(`update${rid}`, dataFormat(rid));
 })
 app.post("/rename", (req, res) => {
-	pushData({name: req.body.name, info: "名前を変更"})
-	io.emit("update", dataFormat());
+	const rid = req.body.rid
+	pushData({name: req.body.name, info: "名前を変更"}, rid)
+	io.emit(`update${rid}`, dataFormat(rid));
 })
 app.post("/X", (req, res) => {
-	pushData({name: req.body.name, info: "Xボタン押した"})
-	io.emit("update", dataFormat());
+	const rid = req.body.rid
+	pushData({name: req.body.name, info: "Xボタン押した"}, rid)
+	io.emit(`update${rid}`, dataFormat(rid));
 })
 app.post("/Y", (req, res) => {
-	pushData({name: req.body.name, info: "Yボタン押した"})
-	io.emit("update", dataFormat());
+	const rid = req.body.rid
+	pushData({name: req.body.name, info: "Yボタン押した"}, rid)
+	io.emit(`update${rid}`, dataFormat(rid));
 })
 app.get("/reset", (req, res) => {
-	data = data.filter(a => false)
-	io.emit("update", dataFormat());
+	const rid = req.body?.rid
+	chatData[rid].data = chatData[rid]?.data?.filter(a => false)
+	io.emit(`update${rid}`, dataFormat(rid));
 })
 
 // HTTP サーバーを Express アプリケーションから生成
@@ -65,27 +97,45 @@ const io = new Server(server);
 // クライアントの接続を監視する
 io.on("connection", (socket) => {
 	const username = socket.handshake.query.username || "無名";
-	console.log(`${username}が入室`);
-	// pushData({info: `${username}が入室`})
+	const rid = socket.handshake.query.rid ?? "無名";
+	console.log(`${decodeURIComponent(rid)} に ${username}が入室`);
 	
-	users.push(username)
+	if (!chatData[rid]) {
+		chatData[rid] = {
+			data: new Array(),
+			users: new Array()
+		}
+	}
 	
-	io.emit("update", dataFormat());
-	io.emit("getUsers", users);
+	// const rid = getRid(req)
+	// pushData({info: `${username}が入室`}, rid)
+	
+	chatData[rid]?.users.push(username)
+	//console.log(JSON.stringify(chatData, null, "\t"))
+	
+	io.emit(`update${rid}`, dataFormat(rid));
+	io.emit(`getUsers${rid}`, chatData[rid]?.users);
 
 	// 必要に応じて、ここで各種イベントをハンドルする
 	socket.on("disconnect", () => {
 		const username = socket.handshake.query.username ?? "無名";
-		console.log(`${username}が退室`);
-		// pushData({info: `${username}が退室`})
+		const rid = socket.handshake.query.rid ?? "無名";
+		console.log(`${decodeURIComponent(rid)} から ${username}が退室`);
 		
-		const index = users.indexOf(username)
+		// const rid = getRid(req)
+		// pushData({info: `${username}が退室`}, rid)
+		
+		const index = chatData[rid]?.users.indexOf(username)
+		console.log(chatData[rid]?.users)
+		console.log(index)
 		if (index >= 0) {
-			users.splice(index)
+			chatData[rid]?.users.splice(index, 1)
 		}
+		console.log(chatData[rid]?.users)
 		
-		io.emit("update", dataFormat());
-		io.emit("getUsers", users);
+		io.emit(`update${rid}`, dataFormat(rid));
+		io.emit(`getUsers${rid}`, chatData[rid]?.users);
+		return
 	});
 });
 
