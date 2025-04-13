@@ -22,6 +22,7 @@ html, body {
 
 /* 部屋情報表示部分 */
 #room-info {
+	cursor: pointer;
 	display: flex;
 	flex-flow: row;
 	align-items: center;

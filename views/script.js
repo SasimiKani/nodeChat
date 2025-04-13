@@ -138,6 +138,27 @@ document.querySelector("#overlayBack").addEventListener("click", () => {
 	document.querySelector("#overlayBack").classList.remove("show")
 })
 
+document.querySelector('#room-info').addEventListener("click", () => {
+	try {
+		const text = document.createElement("input")
+		text.value = location.href
+		text.style.position = "fixed"
+		text.style.opacity = 0
+		document.body.appendChild(text)
+		text.focus()
+		text.select()
+		if (document.execCommand("copy")) {
+			alert("URLをクリップボードにコピーしました")
+		} else {
+			alert("クリップボードにコピーできませんでした")
+		}
+	} catch (err) {
+		alert("クリップボードにコピーできませんでした")
+	} finally {
+		document.body.removeChild(text)
+	}
+})
+
 // チャットメッセージ表示領域の更新処理
 function updateResponseContainer(messageList, currentUsername) {
 	const container = document.querySelector("div#responseContainer")
