@@ -18,7 +18,7 @@
 		<div id="userContainer">
 			<button name="rename" onclick="rename()">
 				<!-- SVGアイコン -->
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" fill="white" stroke="white">
 					<title>pencil-outline</title>
 					<path d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z" />
 				</svg>
@@ -27,7 +27,13 @@
 		</div>
 		<div id="messageContainer">
 			<input name="text" placeholder="メッセージを入力" onkeydown="handleTextKeydown(event)">
-			<button name="sendText" onclick="sendText()">送信</button>
+			<button name="sendText" onclick="sendText()">
+				<!-- SVGアイコン -->
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" fill="white" stroke="white">
+					<title>send-variant-outline</title>
+					<path d="M3 20V4L22 12M5 17L16.85 12L5 7V10.5L11 12L5 13.5M5 17V7 13.5Z" />
+				</svg>
+			</button>
 		</div>
 		<textarea id="response" spellcheck="false" readonly></textarea>
 		<div id="responseContainer"></div>

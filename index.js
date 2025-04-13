@@ -8,6 +8,8 @@ const fs = require("fs")
 
 app.set('view engine', 'ejs');
 app.use(express.json());
+// 'views'フォルダ内のファイルを静的コンテンツとして公開
+app.use(express.static(path.join(__dirname, "views")));
 
 let data = []
 let users = []
@@ -52,34 +54,6 @@ app.post("/Y", (req, res) => {
 app.get("/reset", (req, res) => {
 	data = data.filter(a => false)
 	io.emit("update", dataFormat());
-})
-
-// スクリプトを返す
-app.get("/script.js", (req, res) => {
-	const file = fs.readFileSync(path.resolve(__dirname, "views", "script.js"))
-	const decoder = new TextDecoder("utf-8")
-	const decodeFile = decoder.decode(file)
-
-	res.header("Content-type", "text/javascript")
-	res.send(decodeFile)
-})
-// スタイルシートを返す
-app.get("/style.css", (req, res) => {
-	const file = fs.readFileSync(path.resolve(__dirname, "views", "style.css"))
-	const decoder = new TextDecoder("utf-8")
-	const decodeFile = decoder.decode(file)
-
-	res.header("Content-type", "text/css")
-	res.send(decodeFile)
-})
-// スタイルシートを返す
-app.get("/mobile.css", (req, res) => {
-	const file = fs.readFileSync(path.resolve(__dirname, "views", "mobile.css"))
-	const decoder = new TextDecoder("utf-8")
-	const decodeFile = decoder.decode(file)
-
-	res.header("Content-type", "text/css")
-	res.send(decodeFile)
 })
 
 // HTTP サーバーを Express アプリケーションから生成
