@@ -10,8 +10,8 @@ html, body {
 /* アプリ全体を包むコンテナ */
 #container {
 	margin: auto;
-	/*max-width: 800px;*/
-	height: 90vh;
+	max-width: 1000px;
+	height: 100vh;
 	display: flex;
 	flex-direction: column;
 	background-color: #ffffff;
@@ -31,6 +31,51 @@ html, body {
 	color: #fff;
 	text-align: center;
 	font-size: 1.2rem;
+}
+#users {
+	cursor: pointer;
+}
+
+#userList {
+	display: flex;
+	flex-flow: column;
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	width: 50%;
+	height: auto;
+	border-radius: .5rem;
+	background-color: white;
+	color: black;
+	overflow: hidden;
+	opacity: 0;
+}
+#userList .head {
+	text-align: left;
+	padding: 1rem;
+	background-color: #007bff;
+	color: white;
+}
+#userList .user-info {
+	text-align: left;
+	padding: .5rem .5rem .5rem 1.5rem;
+}
+#userList.show {
+	opacity: 1;
+	z-index: 9999;
+}
+#overlayBack {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100vh;
+	background-color: #0005;
+}
+#overlayBack.show {
+	display: block;
+	z-index: 9998;
 }
 
 /* ユーザー名入力欄 */

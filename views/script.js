@@ -60,6 +60,7 @@ function rename() {
 	if(connect(true)) {
 		fetch("/rename", postRequestBody())
 			.then(res => response(res))
+			.catch(err => console.error("エラー:", err))
 	}
 }
 
@@ -107,10 +108,35 @@ function connect(isRename = false) {
 	// サーバーからのユーザー数取得イベント処理
 	socket.on(`getUsers${rid}`, (data) => {
 		document.querySelector("#users").textContent = `部屋の人数：${data.length}人`
+		
+		const userList = document.querySelector("#userList")
+		Array.from(userList.children).forEach(user => user.remove())
+		
+		const head = document.createElement("div")
+		head.textContent = "メンバー"
+		head.classList.add("head")
+		userList.appendChild(head)
+		
+		for (row of data) {
+			const user = document.createElement("div")
+			user.classList.add("user-info")
+			console.log(row)
+			user.textContent = row + (document.querySelector("input[name=username]")?.value === row ? "（自分）" : "")
+			userList.appendChild(user)
+		}
 	})
 
 	return true
 }
+
+document.querySelector("#users").addEventListener("click", () => {
+	document.querySelector("#userList").classList.add("show")
+	document.querySelector("#overlayBack").classList.add("show")
+})
+document.querySelector("#overlayBack").addEventListener("click", () => {
+	document.querySelector("#userList").classList.remove("show")
+	document.querySelector("#overlayBack").classList.remove("show")
+})
 
 // チャットメッセージ表示領域の更新処理
 function updateResponseContainer(messageList, currentUsername) {
@@ -183,7 +209,9 @@ function getDeviceType() {
 // ページ読み込み完了時の初期処理（モバイル用クラス設定、初期接続）
 document.addEventListener("DOMContentLoaded", () => {
 	if(getDeviceType() === "Mobile") {
-		document.querySelector('#users').classList.add("mobi-4")
+		document.querySelector('#room-info').classList.add("mobi-25")
+		document.querySelector('#users').classList.add("mobi-25")
+		document.querySelector("#userList").classList.add("mobi-25")
 		document.querySelector('input[name="username"]').classList.add("mobi-4")
 		document.querySelector('#response').classList.add("mobi-25")
 		document.querySelector('input[name="text"]').classList.add("mobi-25")
