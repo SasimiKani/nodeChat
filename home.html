@@ -24,6 +24,9 @@
 			padding: 15px;
 			margin-bottom: 20px;
 		}
+		#description .caution {
+			color: red;
+		}
 
 		/* チャットルーム作成ボタンのスタイル */
 		#makeRoom {
@@ -49,8 +52,9 @@
 <body>
 	<div id="container">
 		<div id="description">
-			チャットルーム作成ボタンを押すと新しいチャットルームが作成されます
-			チャット画面左上のルームIDをクリック/タップするとURLをコピーできます
+			<p>チャットルーム作成ボタンを押すと新しいチャットルームが作成されます</p>
+			<p>チャット画面左上のルームIDをクリック/タップするとURLをコピーできます</p>
+			<p class="caution">※すべてのチャット履歴は毎日0時に消去されます</p>
 		</div>
 		<div id="makeRoom" onclick="makeRoom()">
 			チャットルーム作成
@@ -65,6 +69,24 @@
 		const rid = Array.from({length: 40}, () => rand()).join("")
 		const url = `http:\/\/34.31.104.64:3000/?rid=${rid}`
 		window.open(url)
+	}
+	
+	function getDeviceType() {
+		const ua = navigator.userAgent
+		if (/Mobi|Android/i.test(ua)) {
+			if (/iPad|Tablet|Nexus 7/i.test(ua)) {
+				return "Tablet"
+			}
+			return "Mobile"
+		}
+		return "Desktop"
+	}
+	
+	if (getDeviceType() === "Mobile") {
+		document.querySelector("#container").style.maxWidth = "90%"
+		document.querySelector("#description").style.fontSize = "1.5rem"
+		document.querySelector("#description").style.textAlign = "left"
+		document.querySelector("#makeRoom").style.fontSize = "2.5rem"
 	}
 	</script>
 </body>
