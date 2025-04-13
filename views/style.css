@@ -32,7 +32,14 @@ html, body {
 	text-align: center;
 	font-size: 1.2rem;
 }
+#rid {
+	width: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 #users {
+	width: 50%;
 	cursor: pointer;
 }
 
