@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=1000%, user-scalable=no">
+	<title>チャットホーム</title>
+	<style>
+		/* コンテナ全体のスタイル */
+		#container {
+			max-width: 600px;
+			margin: 40px auto;
+			padding: 20px;
+			background-color: #f4f4f9;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		}
+
+		/* 説明文のスタイル */
+		#description {
+			font-size: 16px;
+			color: #333;
+			text-align: center;
+			padding: 15px;
+			margin-bottom: 20px;
+		}
+
+		/* チャットルーム作成ボタンのスタイル */
+		#makeRoom {
+			display: block;
+			cursor: pointer;
+			background-color: #28a745;
+			color: #fff;
+			text-align: center;
+			padding: 15px 0;
+			border-radius: 4px;
+			font-size: 18px;
+			font-weight: bold;
+			transition: background-color 0.3s ease;
+			user-select: none;
+		}
+
+		/* ホバー時の背景色変更 */
+		#makeRoom:hover {
+			background-color: #218838;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div id="description">
+			チャットルーム作成ボタンを押すと新しいチャットルームが作成されます
+		</div>
+		<div id="makeRoom" onclick="makeRoom()">
+			チャットルーム作成
+		</div>
+	</div>
+	<script>
+	function makeRoom() {
+		const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
+		const rand = () => {
+			return charset[Math.round(Math.random() * charset.length)]
+		}
+		const rid = Array.from({length: 40}, () => rand()).join("")
+		const url = `http:\/\/34.31.104.64:3000/?rid=${rid}`
+		window.open(url)
+	}
+	</script>
+</body>
+</html>
