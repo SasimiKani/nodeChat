@@ -190,7 +190,7 @@ function updateResponseContainer(messageList, currentUsername) {
 	const container = document.querySelector("div#responseContainer")
 	container.innerHTML = ""; // 既存要素のクリア
 
-	messageList.forEach(row => {
+	messageList.forEach(async row => {
 		// 各行ごとに表示用コンテナを生成
 		const responseItem = document.createElement("div")
 		responseItem.classList.add("responseItem")
@@ -220,13 +220,13 @@ function updateResponseContainer(messageList, currentUsername) {
 			
 			filesDiv.classList.add("item")
 			filesDiv.classList.add("item-files")
-			
-			if (row?.info) {
-				responseItem.classList.add("responseItem-info")
-			} else if (currentUsername !== row?.name) {
-				responseItem.classList.add("responseItem-he")
-				filesDiv.classList.add("item-files-he")
-			}
+		}
+		
+		if (row?.info) {
+			responseItem.classList.add("responseItem-info")
+		} else if (currentUsername !== row?.name) {
+			responseItem.classList.add("responseItem-he")
+			filesDiv.classList.add("item-files-he")
 		}
 
 		// Mobile用のクラス追加処理
