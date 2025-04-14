@@ -138,7 +138,7 @@ document.querySelector("#overlayBack").addEventListener("click", () => {
 	document.querySelector("#overlayBack").classList.remove("show")
 })
 
-document.querySelector('#room-info').addEventListener("click", () => {
+document.querySelector('#rid').addEventListener("click", () => {
 	try {
 		const text = document.createElement("input")
 		text.value = location.href
@@ -230,6 +230,7 @@ function getDeviceType() {
 // ページ読み込み完了時の初期処理（モバイル用クラス設定、初期接続）
 document.addEventListener("DOMContentLoaded", () => {
 	if(getDeviceType() === "Mobile") {
+		document.querySelector('#container').classList.add("mobi-100")
 		document.querySelector('#room-info').classList.add("mobi-25")
 		document.querySelector('#users').classList.add("mobi-25")
 		document.querySelector("#userList").classList.add("mobi-25")
