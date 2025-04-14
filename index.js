@@ -1,12 +1,13 @@
 const express = require("express")
 const multer = require("multer")
-const upload = multer()
+const upload = multer({ dest: 'uploads/' })
 const http = require("http");				// HTTP サーバーを作成するために必要
 const { Server } = require("socket.io"); // socket.io の Server クラスをインポート
 const app = express()
 
 const path = require("path")
 const fs = require("fs")
+const { Blob } = require('buffer')
 
 app.set('view engine', 'ejs');
 app.use(express.json());
@@ -40,7 +41,7 @@ const dataFormat = (rid=undefined) => {
 	return JSON.stringify(Array.from(chatData[rid]?.data)?.reverse())
 }
 
-const pushData = (reqData, rid=undefined, files=undefined) => {
+const pushData = (reqData, rid=undefined, files=undefined) => new Promise(r => {
 	const date = new Date()
 	const hour = `00${date.getHours()}`.slice(-2)
 	const minute = `00${date.getMinutes()}`.slice(-2)
@@ -48,56 +49,73 @@ const pushData = (reqData, rid=undefined, files=undefined) => {
 	
 	const filesSrc = []
 	if (files) {
+		let chain = Promise.resolve()
 		files.forEach(file => {
-			const mimetype = file.mimetype
-			console.log(mimetype)
-			if (mimetype.match(/image.*/g)) {
-				const base64Image = file.buffer.toString('base64');
-				const imgSrc = `data:${mimetype};base64,${base64Image}`;
-				filesSrc.push({src: imgSrc, mimetype: mimetype})
-			}
-			else if (mimetype.match(/video.*/g)) {
-				const base64Video = file.buffer.toString('base64');
-				const dataUrl = `data:${mimetype};base64,${base64Video}`;
-				filesSrc.push({src: dataUrl, mimetype: mimetype})
-			}
+			chain = chain.then(() => 
+				new Promise(async resolve => {
+					const mimetype = file.mimetype
+					const fileBuffer = fs.readFileSync(file.path)
+					const blob = new Blob([fileBuffer], { type: mimetype })
+					
+					const arrayBuffer = await blob.arrayBuffer()
+					const base64FromBlob = Buffer.from(arrayBuffer).toString('base64');
+					const dataUrl = `data:image/png;base64,${base64FromBlob}`;
+					filesSrc.push({src: dataUrl, mimetype: mimetype})
+					
+					resolve()
+				})
+			)
 		})
+		chain.then(() => {
+			chatData[rid]?.data?.push({
+				time: time,
+				info: reqData?.info,
+				name: reqData?.name,
+				text: reqData?.text,
+				files: filesSrc
+			})
+			r()
+		})
+	} else {
+		chatData[rid]?.data?.push({
+			time: time,
+			info: reqData?.info,
+			name: reqData?.name,
+			text: reqData?.text,
+			files: undefined
+		})
+		r()
 	}
-	
-	chatData[rid]?.data?.push({
-		time: time,
-		info: reqData?.info,
-		name: reqData?.name,
-		text: reqData?.text,
-		files: filesSrc
-	})
-}
+})
 
 app.get("/", (req, res) => {
 	res.status(200).render("index")
 })
 
 app.post("/sendText", (req, res) => {
-	console.log(req.body)
 	const rid = req.body.rid
-	pushData({name: req.body.name, text: req.body.text}, rid)
-	io.emit(`update${rid}`, dataFormat(rid));
+	pushData({name: req.body.name, text: req.body.text}, rid).then(() => {
+		io.emit(`update${rid}`, dataFormat(rid));
+	})
 })
 app.post("/rename", (req, res) => {
 	const rid = req.body.rid
-	pushData({name: req.body.name, info: "名前を変更"}, rid)
-	io.emit(`update${rid}`, dataFormat(rid));
+	pushData({name: req.body.name, info: "名前を変更"}, rid).then(() => {
+		io.emit(`update${rid}`, dataFormat(rid));
+	})
 })
 app.post("/sendMedia", upload.any(), (req, res) => {
 	const rid = req.body.rid
 	const files = req.files
-	pushData({name: req.body.name}, rid, files)
-	io.emit(`update${rid}`, dataFormat(rid));
+	pushData({name: req.body.name}, rid, files).then(() => {
+		io.emit(`update${rid}`, dataFormat(rid));
+	})
 })
 app.post("/Y", (req, res) => {
 	const rid = req.body.rid
-	pushData({name: req.body.name, info: "Yボタン押した"}, rid)
-	io.emit(`update${rid}`, dataFormat(rid));
+	pushData({name: req.body.name, info: "Yボタン押した"}, rid).then(() => {
+		io.emit(`update${rid}`, dataFormat(rid));
+	})
 })
 app.get("/reset", (req, res) => {
 	const rid = req.body?.rid
@@ -143,12 +161,9 @@ io.on("connection", (socket) => {
 		// pushData({info: `${username}が退室`}, rid)
 		
 		const index = chatData[rid]?.users.indexOf(username)
-		console.log(chatData[rid]?.users)
-		console.log(index)
 		if (index >= 0) {
 			chatData[rid]?.users.splice(index, 1)
 		}
-		console.log(chatData[rid]?.users)
 		
 		io.emit(`update${rid}`, dataFormat(rid));
 		io.emit(`getUsers${rid}`, chatData[rid]?.users);
