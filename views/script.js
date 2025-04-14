@@ -196,7 +196,8 @@ function updateResponseContainer(messageList, currentUsername) {
 //	console.log (messageList)
 //	container.innerHTML = ""; // 既存要素のクリア
 
-	messageList.forEach(async row => {
+//console.time("set div")
+	messageList.forEach(row => {
 		// 各行ごとに表示用コンテナを生成
 		const responseItem = document.createElement("div")
 		responseItem.classList.add("responseItem")
@@ -207,28 +208,7 @@ function updateResponseContainer(messageList, currentUsername) {
 		const nameDiv = createElem("div", "item item-name", row?.name)
 		const textDiv = createElem("div", "item item-text", row?.text)
 		const filesDiv = document.createElement("div")
-		
-		if (row.files) {
-			row.files.forEach(file => {
-				const {src, mimetype} = file
-				if (mimetype.match(/image.*/g)) {
-					const img = document.createElement("img")
-					lazyLoadMedia(img, src)
-					//img.src = src
-					filesDiv.appendChild(img)
-				}
-				else if (mimetype.match(/video.*/g)) {
-					const video = document.createElement("video")
-					lazyLoadMedia(video, src)
-					//video.src = src
-					video.controls = true
-					filesDiv.appendChild(video)
-				}
-			})
-			
-			filesDiv.classList.add("item")
-			filesDiv.classList.add("item-files")
-		}
+		filesDiv.classList.add("item-files")
 		
 		if (row?.info) {
 			responseItem.classList.add("responseItem-info")
@@ -253,7 +233,7 @@ function updateResponseContainer(messageList, currentUsername) {
 		}
 		if(row?.text) {
 			textItem.appendChild(textDiv)
-		} else if (row.files?.length > 0) {
+		} else if (row.files) {
 			textItem.appendChild(filesDiv)
 		}
 
@@ -267,6 +247,33 @@ function updateResponseContainer(messageList, currentUsername) {
 		else
 			container.appendChild(responseItem)
 	})
+//console.timeEnd("set div")
+//console.time("set files")
+	Array.from(messageList).reverse().forEach((row, i) => {
+		const filesDiv = container.children[i].querySelector(".textItem .item-files")
+		if (row.files) {
+			row.files.forEach(file => {
+				const {src, mimetype} = file
+				if (mimetype.match(/image.*/g)) {
+					const img = document.createElement("img")
+					lazyLoadMedia(img, src)
+					//img.src = src
+					filesDiv.appendChild(img)
+				}
+				else if (mimetype.match(/video.*/g)) {
+					const video = document.createElement("video")
+					lazyLoadMedia(video, src)
+					//video.src = src
+					video.controls = true
+					filesDiv.appendChild(video)
+				}
+			})
+			
+			filesDiv.classList.add("item")
+			filesDiv.classList.add("item-files")
+		}
+	})
+//console.timeEnd("set files")
 }
 
 function lazyLoadMedia(mediaElem, src) {
