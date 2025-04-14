@@ -12,6 +12,7 @@ function handleTextKeydown(e) {
 		document.querySelector('button[name="sendText"]').click()
 	}
 }
+document.querySelector(`input[name="text"]`).onkeydown = handleTextKeydown
 
 // fetch レスポンスの共通処理（必要に応じて実装）
 function response(res) {
@@ -54,6 +55,8 @@ function sendText() {
 		.then(res => response(res))
 		.catch(err => console.error("エラー:", err))
 }
+document.querySelector(`button[name="sendText"]`).onclick = sendText 
+
 // メディア送信処理
 function sendMedia() {
 	const username = document.querySelector("input[name='username']").value
@@ -74,6 +77,7 @@ function sendMedia() {
 		.then(res => response(res))
 		.catch(err => console.error("エラー:", err))
 }
+document.querySelector(`button[name="sendMedia"]`).onclick = sendText 
 document.querySelector("input[name=file]").addEventListener("change", () => {
 	sendMedia()
 })
@@ -198,29 +202,31 @@ function updateResponseContainer(messageList, currentUsername) {
 		const textDiv = createElem("div", "item item-text", row?.text)
 		const filesDiv = document.createElement("div")
 		
-		row.files.forEach(file => {
-			const {src, mimetype} = file
-			if (mimetype.match(/image.*/g)) {
-				const img = document.createElement("img")
-				img.src = src
-				filesDiv.appendChild(img)
+		if (row.files) {
+			row.files.forEach(file => {
+				const {src, mimetype} = file
+				if (mimetype.match(/image.*/g)) {
+					const img = document.createElement("img")
+					img.src = src
+					filesDiv.appendChild(img)
+				}
+				else if (mimetype.match(/video.*/g)) {
+					const video = document.createElement("video")
+					video.src = src
+					video.controls = true
+					filesDiv.appendChild(video)
+				}
+			})
+			
+			filesDiv.classList.add("item")
+			filesDiv.classList.add("item-files")
+			
+			if (row?.info) {
+				responseItem.classList.add("responseItem-info")
+			} else if (currentUsername !== row?.name) {
+				responseItem.classList.add("responseItem-he")
+				filesDiv.classList.add("item-files-he")
 			}
-			else if (mimetype.match(/video.*/g)) {
-				const video = document.createElement("video")
-				video.src = src
-				video.controls = true
-				filesDiv.appendChild(video)
-			}
-		})
-		
-		filesDiv.classList.add("item")
-		filesDiv.classList.add("item-files")
-		
-		if (row?.info) {
-			responseItem.classList.add("responseItem-info")
-		} else if (currentUsername !== row?.name) {
-			responseItem.classList.add("responseItem-he")
-			filesDiv.classList.add("item-files-he")
 		}
 
 		// Mobile用のクラス追加処理
