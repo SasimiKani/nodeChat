@@ -46,9 +46,21 @@ const pushData = (reqData, rid=undefined, files=undefined) => {
 	const minute = `00${date.getMinutes()}`.slice(-2)
 	const time = `${hour}:${minute}`
 	
+	const filesSrc = []
 	if (files) {
 		files.forEach(file => {
-			console.log(file)
+			const mimetype = file.mimetype
+			console.log(mimetype)
+			if (mimetype.match(/image.*/g)) {
+				const base64Image = file.buffer.toString('base64');
+				const imgSrc = `data:${mimetype};base64,${base64Image}`;
+				filesSrc.push({src: imgSrc, mimetype: mimetype})
+			}
+			else if (mimetype.match(/video.*/g)) {
+				const base64Video = file.buffer.toString('base64');
+				const dataUrl = `data:${mimetype};base64,${base64Video}`;
+				filesSrc.push({src: dataUrl, mimetype: mimetype})
+			}
 		})
 	}
 	
@@ -56,7 +68,8 @@ const pushData = (reqData, rid=undefined, files=undefined) => {
 		time: time,
 		info: reqData?.info,
 		name: reqData?.name,
-		text: reqData?.text
+		text: reqData?.text,
+		files: filesSrc
 	})
 }
 
@@ -78,7 +91,7 @@ app.post("/rename", (req, res) => {
 app.post("/sendMedia", upload.any(), (req, res) => {
 	const rid = req.body.rid
 	const files = req.files
-	pushData({name: req.body.name, info: "Xボタン押した"}, rid, files)
+	pushData({name: req.body.name}, rid, files)
 	io.emit(`update${rid}`, dataFormat(rid));
 })
 app.post("/Y", (req, res) => {

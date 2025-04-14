@@ -168,6 +168,22 @@ button[name="rename"] {
 	background-color: green;
 	color: white;
 }
+.item-files {
+	display: flex;
+	flex-flow: row-reverse;
+	border: none;
+	border-radius: 0;
+}
+.item-files-he {
+	flex-flow: row;
+}
+.item-files img, .item-files video{
+	border: 1px solid gray;
+	max-width: 60%;
+	max-height: 25vh;
+	width: auto;    /* 横幅を自動調整 */
+	height: auto;    /* 横幅を自動調整 */
+}
 .responseItem-he .item-text {
 	background-color: white;
 	color: black;
@@ -191,6 +207,21 @@ input[name="text"] {
 	border-radius: 4px;
 	margin-right: 1rem;
 }
+/* ファイル入力フィールド */
+label[for="inputFile"] {
+	cursor: pointer;
+	width: 30px;
+	margin: .5em;
+	padding: .5em .8em;
+	border-radius: 30px;
+	transition: background-color .3s ease;
+}
+label[for="inputFile"]:hover {
+	background-color: gray;
+}
+input[name="file"] {
+	display: none;
+}
 
 /* 送信ボタン */
 button[name="sendText"] {
@@ -206,6 +237,9 @@ button[name="sendText"] {
 
 button[name="sendText"]:hover {
 	background-color: #218838;
+}
+button[name="sendMedia"] {
+	display: none;
 }
 
 /* スクロールバーのスタイル（WebKit系ブラウザ） */

@@ -56,14 +56,15 @@ function sendText() {
 }
 // メディア送信処理
 function sendMedia() {
+	const username = document.querySelector("input[name='username']").value
 	const inputFile = document.querySelector("input[name='file']")
 	const formData = new FormData()
-	console.log(inputFile.files)
 	if (inputFile.files === "") return
 
 	for (const file of Array.from(inputFile.files)) {
 		formData.append("files", file)
 	}
+	formData.append("name", username)
 	formData.append("rid", rid)
 
 	// 入力欄をクリア
@@ -73,6 +74,9 @@ function sendMedia() {
 		.then(res => response(res))
 		.catch(err => console.error("エラー:", err))
 }
+document.querySelector("input[name=file]").addEventListener("change", () => {
+	sendMedia()
+})
 
 // ユーザー名変更（rename）処理
 function rename() {
@@ -139,7 +143,6 @@ function connect(isRename = false) {
 		for (row of data) {
 			const user = document.createElement("div")
 			user.classList.add("user-info")
-			console.log(row)
 			user.textContent = row + (document.querySelector("input[name=username]")?.value === row ? "（自分）" : "")
 			userList.appendChild(user)
 		}
@@ -187,17 +190,38 @@ function updateResponseContainer(messageList, currentUsername) {
 		// 各行ごとに表示用コンテナを生成
 		const responseItem = document.createElement("div")
 		responseItem.classList.add("responseItem")
-		if (row?.info) {
-			responseItem.classList.add("responseItem-info")
-		} else if (currentUsername !== row?.name) {
-			responseItem.classList.add("responseItem-he")
-		}
 
 		// 要素生成（各要素は createElem() で生成）
 		const timeDiv = createElem("div", "item item-time", row?.time)
 		const infoDiv = createElem("div", "item item-info", row?.info)
 		const nameDiv = createElem("div", "item item-name", row?.name)
 		const textDiv = createElem("div", "item item-text", row?.text)
+		const filesDiv = document.createElement("div")
+		
+		row.files.forEach(file => {
+			const {src, mimetype} = file
+			if (mimetype.match(/image.*/g)) {
+				const img = document.createElement("img")
+				img.src = src
+				filesDiv.appendChild(img)
+			}
+			else if (mimetype.match(/video.*/g)) {
+				const video = document.createElement("video")
+				video.src = src
+				video.controls = true
+				filesDiv.appendChild(video)
+			}
+		})
+		
+		filesDiv.classList.add("item")
+		filesDiv.classList.add("item-files")
+		
+		if (row?.info) {
+			responseItem.classList.add("responseItem-info")
+		} else if (currentUsername !== row?.name) {
+			responseItem.classList.add("responseItem-he")
+			filesDiv.classList.add("item-files-he")
+		}
 
 		// Mobile用のクラス追加処理
 		if(getDeviceType() === "Mobile") {
@@ -215,9 +239,11 @@ function updateResponseContainer(messageList, currentUsername) {
 		}
 		if(row?.text) {
 			textItem.appendChild(textDiv)
+		} else if (row.files?.length > 0) {
+			textItem.appendChild(filesDiv)
 		}
 
-		// 表示順の調整：info → textItem → time
+		// 表示順の調整：files → info → textItem → time
 		if(row?.info) responseItem.appendChild(infoDiv)
 		if(row?.name) responseItem.appendChild(textItem)
 		if(row?.time) responseItem.appendChild(timeDiv)
