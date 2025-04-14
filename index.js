@@ -40,6 +40,9 @@ const getRid = (req) => {
 const dataFormat = (rid=undefined) => {
 	return JSON.stringify(Array.from(chatData[rid]?.data)?.reverse())
 }
+const lastDataFormat = (rid=undefined) => {
+	return JSON.stringify([ Array.from(chatData[rid]?.data)?.reverse()?.at(0) ])
+}
 
 const pushData = (reqData, rid=undefined, files=undefined) => new Promise(r => {
 	const date = new Date()
@@ -95,20 +98,20 @@ app.get("/", (req, res) => {
 app.post("/sendText", (req, res) => {
 	const rid = req.body.rid
 	pushData({name: req.body.name, text: req.body.text}, rid).then(() => {
-		io.emit(`update${rid}`, dataFormat(rid));
+		io.emit(`update${rid}`, lastDataFormat(rid));
 	})
 })
 app.post("/rename", (req, res) => {
 	const rid = req.body.rid
 	pushData({name: req.body.name, info: "名前を変更"}, rid).then(() => {
-		io.emit(`update${rid}`, dataFormat(rid));
+		io.emit(`update${rid}`, lastDataFormat(rid));
 	})
 })
 app.post("/sendMedia", upload.any(), (req, res) => {
 	const rid = req.body.rid
 	const files = req.files
 	pushData({name: req.body.name}, rid, files).then(() => {
-		io.emit(`update${rid}`, dataFormat(rid));
+		io.emit(`update${rid}`, lastDataFormat(rid));
 	})
 })
 app.post("/Y", (req, res) => {

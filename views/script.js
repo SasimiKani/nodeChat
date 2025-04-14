@@ -188,7 +188,9 @@ document.querySelector('#rid').addEventListener("click", () => {
 // チャットメッセージ表示領域の更新処理
 function updateResponseContainer(messageList, currentUsername) {
 	const container = document.querySelector("div#responseContainer")
-	container.innerHTML = ""; // 既存要素のクリア
+	
+//	console.log (messageList)
+//	container.innerHTML = ""; // 既存要素のクリア
 
 	messageList.forEach(async row => {
 		// 各行ごとに表示用コンテナを生成
@@ -254,7 +256,10 @@ function updateResponseContainer(messageList, currentUsername) {
 		if(row?.name) responseItem.appendChild(textItem)
 		if(row?.time) responseItem.appendChild(timeDiv)
 
-		container.appendChild(responseItem)
+		if (container.children.length > 0)
+			container.children[0].before(responseItem)
+		else
+			container.appendChild(responseItem)
 	})
 }
 
