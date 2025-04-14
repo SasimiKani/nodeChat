@@ -127,6 +127,10 @@ function connect(isRename = false) {
 	})
 
 	// サーバーからの更新イベント処理
+	socket.on(`update${rid}${username}`, (data) => {
+		const parsedData = JSON.parse(data)
+		updateResponseContainer(parsedData, username)
+	})
 	socket.on(`update${rid}`, (data) => {
 		const parsedData = JSON.parse(data)
 		updateResponseContainer(parsedData, username)
@@ -209,12 +213,14 @@ function updateResponseContainer(messageList, currentUsername) {
 				const {src, mimetype} = file
 				if (mimetype.match(/image.*/g)) {
 					const img = document.createElement("img")
-					img.src = src
+					lazyLoadMedia(img, src)
+					//img.src = src
 					filesDiv.appendChild(img)
 				}
 				else if (mimetype.match(/video.*/g)) {
 					const video = document.createElement("video")
-					video.src = src
+					lazyLoadMedia(video, src)
+					//video.src = src
 					video.controls = true
 					filesDiv.appendChild(video)
 				}
@@ -261,6 +267,18 @@ function updateResponseContainer(messageList, currentUsername) {
 		else
 			container.appendChild(responseItem)
 	})
+}
+
+function lazyLoadMedia(mediaElem, src) {
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        mediaElem.src = src;
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '100px' });
+  observer.observe(mediaElem);
 }
 
 // ヘルパー関数：タグ、クラス、テキストを指定して要素生成

@@ -38,7 +38,7 @@ const getRid = (req) => {
 }
 
 const dataFormat = (rid=undefined) => {
-	return JSON.stringify(Array.from(chatData[rid]?.data)?.reverse())
+	return JSON.stringify(Array.from(chatData[rid]?.data))
 }
 const lastDataFormat = (rid=undefined) => {
 	return JSON.stringify([ Array.from(chatData[rid]?.data)?.reverse()?.at(0) ])
@@ -77,7 +77,7 @@ const pushData = (reqData, rid=undefined, files=undefined) => new Promise(r => {
 				text: reqData?.text,
 				files: filesSrc
 			})
-			r()
+			r(`[${time}] 送信：${reqData?.name} text:「${reqData?.text}」 info:「${reqData?.info}」 files:「${filesSrc[0].mimetype}」`)
 		})
 	} else {
 		chatData[rid]?.data?.push({
@@ -87,7 +87,7 @@ const pushData = (reqData, rid=undefined, files=undefined) => new Promise(r => {
 			text: reqData?.text,
 			files: undefined
 		})
-		r()
+		r(`[${time}] 送信：${reqData?.name} text:「${reqData?.text}」 info:「${reqData?.info}」`)
 	}
 })
 
@@ -97,26 +97,30 @@ app.get("/", (req, res) => {
 
 app.post("/sendText", (req, res) => {
 	const rid = req.body.rid
-	pushData({name: req.body.name, text: req.body.text}, rid).then(() => {
+	pushData({name: req.body.name, text: req.body.text}, rid).then((msg) => {
+		console.log(msg)
 		io.emit(`update${rid}`, lastDataFormat(rid));
 	})
 })
 app.post("/rename", (req, res) => {
 	const rid = req.body.rid
-	pushData({name: req.body.name, info: "名前を変更"}, rid).then(() => {
+	pushData({name: req.body.name, info: "名前を変更"}, rid).then((msg) => {
+		console.log(msg)
 		io.emit(`update${rid}`, lastDataFormat(rid));
 	})
 })
 app.post("/sendMedia", upload.any(), (req, res) => {
 	const rid = req.body.rid
 	const files = req.files
-	pushData({name: req.body.name}, rid, files).then(() => {
+	pushData({name: req.body.name}, rid, files).then((msg) => {
+		console.log(msg)
 		io.emit(`update${rid}`, lastDataFormat(rid));
 	})
 })
 app.post("/Y", (req, res) => {
 	const rid = req.body.rid
-	pushData({name: req.body.name, info: "Yボタン押した"}, rid).then(() => {
+	pushData({name: req.body.name, info: "Yボタン押した"}, rid).then((msg) => {
+		console.log(msg)
 		io.emit(`update${rid}`, dataFormat(rid));
 	})
 })
@@ -151,7 +155,7 @@ io.on("connection", (socket) => {
 	chatData[rid]?.users.push(username)
 	//console.log(JSON.stringify(chatData, null, "\t"))
 	
-	io.emit(`update${rid}`, dataFormat(rid));
+	io.emit(`update${rid}${username}`, dataFormat(rid));
 	io.emit(`getUsers${rid}`, chatData[rid]?.users);
 
 	// 必要に応じて、ここで各種イベントをハンドルする
@@ -168,7 +172,7 @@ io.on("connection", (socket) => {
 			chatData[rid]?.users.splice(index, 1)
 		}
 		
-		io.emit(`update${rid}`, dataFormat(rid));
+		io.emit(`update${rid}${username}`, dataFormat(rid));
 		io.emit(`getUsers${rid}`, chatData[rid]?.users);
 		return
 	});
