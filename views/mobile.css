@@ -1,3 +1,10 @@
+.mobi-100 {
+	margin-left: 0!important;
+	margin-right: 0!important;
+	max-width: 100%!important;
+	width: 100%!important;
+}
+
 .mobi-4 {
 	font-size: 4rem!important;
 }
