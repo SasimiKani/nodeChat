@@ -105,6 +105,29 @@ app.post("/rename", (req, res) => {
 		io.emit(`update${rid}`, lastDataFormat(rid));
 	})
 })
+app.post("/previewMedia", upload.any(), (req, res) => {
+	const rid = req.body.rid
+	const files = req.files
+	const filesSrc = []
+	
+	let chain = Promise.resolve()
+	files.forEach(file => {
+		chain = chain.then(() => 
+			new Promise(async resolve => {
+				const mimetype = file.mimetype
+				const filename = file.filename
+				filesSrc.push({src: filename, mimetype: mimetype})
+				
+				resolve()
+			})
+		)
+	})
+	chain.then(() => {
+		io.emit(`preview${rid}${req.body.name}`, JSON.stringify(filesSrc));
+	})
+	
+	
+})
 app.post("/sendMedia", upload.any(), (req, res) => {
 	const rid = req.body.rid
 	const files = req.files

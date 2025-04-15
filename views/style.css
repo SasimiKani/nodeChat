@@ -111,6 +111,36 @@ button[name="rename"] {
 	color: white;
 }
 
+/* ファイルプレビュー領域 */
+#preview.show {
+	display: none;
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+	background-color: #efefef;
+	padding: 10px;
+}
+#preview > div {
+}
+#preview > div > img, #preview > div > video {
+	border: 1px solid gray;
+	max-width: 60%;
+	max-height: 40vh;
+	width: auto;    /* 横幅を自動調整 */
+	height: auto;    /* 横幅を自動調整 */
+}
+button.remove-preview {
+	cursor: pointer;
+	position: fixed;
+	transform: translate(-30px, 10px);
+	background-color: gray;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+}
+
 /* チャットメッセージ表示領域 */
 #response {
 	flex-grow: 1;
@@ -151,7 +181,7 @@ button[name="rename"] {
 }
 .item-time {
 	border: none;
-	font-size: 10px;
+	font-size: 14px;
 }
 .item-info {
 	border: none;
@@ -159,10 +189,14 @@ button[name="rename"] {
 .textItem {
 	display: flex;
 	flex-flow: column;
+	align-items: end;
+}
+.responseItem-he .textItem {
+	align-items: start;
 }
 .item-name {
 	border: none;
-	font-size: 12px;
+	font-size: 16px;
 }
 .item-text {
 	background-color: green;
@@ -179,8 +213,8 @@ button[name="rename"] {
 }
 .item-files img, .item-files video{
 	border: 1px solid gray;
-	max-width: 60%;
-	max-height: 25vh;
+	max-width: 100%;
+	max-height: 30vh;
 	width: auto;    /* 横幅を自動調整 */
 	height: auto;    /* 横幅を自動調整 */
 }

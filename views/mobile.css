@@ -8,15 +8,26 @@
 .mobi-4 {
 	font-size: 4rem!important;
 }
+label[for="inputFile"].mobi-4 {
+	font-size: 1rem!important;
+	width: 4rem;
+}
+
 .mobi-3 {
 	font-size: 3rem!important;
 }
 .responseItem .mobi-3, .responseItem-he .mobi-3 {
-	margin: 2rem 0;
+	margin: .5rem 0;
 }
 .item.mobi-3 {
 	padding: .5rem 3rem;
 }
+button.remove-preview.mobi-3 {
+	width: 4rem;
+	height: 4rem;
+	transform: translate(-4.2rem, .2rem);
+}
+
 .mobi-25 {
 	font-size: 2.5rem!important;
 }

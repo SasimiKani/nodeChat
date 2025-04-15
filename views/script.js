@@ -6,6 +6,9 @@ const rid = location.search.split("?")
 	?.at(0)?.at(1)
 document.querySelector("#rid").textContent = `ルーム：${decodeURIComponent(rid)}`
 
+// メディアプレビュー中
+let isPreview = false
+
 // テキスト入力欄のEnterキーによる送信処理
 function handleTextKeydown(e) {
 	if(e.key === 'Enter') {
@@ -55,7 +58,36 @@ function sendText() {
 		.then(res => response(res))
 		.catch(err => console.error("エラー:", err))
 }
-document.querySelector(`button[name="sendText"]`).onclick = sendText 
+document.querySelector(`button[name="sendText"]`).onclick = send
+function send() {
+	if (isPreview) {
+		// 画像プレビュー中ならメディア送信
+		sendMedia()
+	} else {
+		// じゃなければテキスト送信
+		sendText()
+	}
+}
+
+// メディアプレビュー
+function previewMedia() {
+	const username = document.querySelector("input[name='username']").value
+	const inputFile = document.querySelector("input[name='file']")
+	const formData = new FormData()
+	if (inputFile.files === "") return
+
+	for (const file of Array.from(inputFile.files)) {
+		formData.append("files", file)
+	}
+	formData.append("name", username)
+	formData.append("rid", rid)
+
+	isPreview = true
+
+	fetch("/previewMedia", {method: "POST", body: formData})
+		.then(res => {})
+		.catch(err => console.error("エラー:", err))
+}
 
 // メディア送信処理
 function sendMedia() {
@@ -72,6 +104,8 @@ function sendMedia() {
 
 	// 入力欄をクリア
 	inputFile.files = null
+	// プレビューを削除
+	document.querySelector(".remove-preview").click()
 
 	fetch("/sendMedia", {method: "POST", body: formData})
 		.then(res => response(res))
@@ -79,7 +113,8 @@ function sendMedia() {
 }
 document.querySelector(`button[name="sendMedia"]`).onclick = sendText 
 document.querySelector("input[name=file]").addEventListener("change", () => {
-	sendMedia()
+	previewMedia()
+//	sendMedia()
 })
 document.querySelector("button[name=rename]").onclick = rename
 
@@ -136,6 +171,55 @@ function connect(isRename = false) {
 		const parsedData = JSON.parse(data)
 		updateResponseContainer(parsedData, username)
 	})
+	
+	// プレビュー
+	socket.on(`preview${rid}${username}`, (data) => {
+		const parsedData = JSON.parse(data)
+		const preview = document.querySelector("#preview")
+		preview.classList.add("show")
+		preview.innerHTML = ""
+		
+		parsedData.forEach(data => {
+			const {src, mimetype} = data
+			
+			const media = document.createElement("div")
+			const remove = document.createElement("button")
+			remove.textContent = "x"
+			remove.classList.add("remove-preview")
+			if(getDeviceType() === "Mobile") {
+				remove.classList.add("mobi-3")
+			}
+			
+			if (mimetype.match(/image.*/g)) {
+				const img = document.createElement("img")
+				lazyLoadMedia(img, src)
+				media.appendChild(img)
+				
+				remove.onclick = () => {
+					img.remove()
+					remove.remove()
+					preview.classList.remove("show")
+					isPreview = false
+				}
+			}
+			else if (mimetype.match(/video.*/g)) {
+				const video = document.createElement("video")
+				lazyLoadMedia(video, src)
+				video.controls = true
+				media.appendChild(video)
+				
+				remove.onclick = () => {
+					video.remove()
+					remove.remove()
+					preview.classList.remove("show")
+					isPreview = false
+				}
+			}
+			media.appendChild(remove)
+			preview.appendChild(media)
+		})
+	})
+	
 
 	// サーバーからのユーザー数取得イベント処理
 	socket.on(`getUsers${rid}`, (data) => {
@@ -239,11 +323,14 @@ function updateResponseContainer(messageList, currentUsername) {
 		} else if (row.files) {
 			textItem.appendChild(filesDiv)
 		}
+		
+		if(row?.time) {
+			textItem.appendChild(timeDiv)
+		}
 
 		// 表示順の調整：files → info → textItem → time
 		if(row?.info) responseItem.appendChild(infoDiv)
 		if(row?.name) responseItem.appendChild(textItem)
-		if(row?.time) responseItem.appendChild(timeDiv)
 
 		if (container.children.length > 0)
 			container.children[0].before(responseItem)
@@ -319,6 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		document.querySelector('#users').classList.add("mobi-25")
 		document.querySelector("#userList").classList.add("mobi-25")
 		document.querySelector('input[name="username"]').classList.add("mobi-4")
+		document.querySelector('label[for="inputFile"]').classList.add("mobi-4")
 		document.querySelector('#response').classList.add("mobi-25")
 		document.querySelector('input[name="text"]').classList.add("mobi-25")
 		document.querySelector('button[name="sendText"]').classList.add("mobi-25")
