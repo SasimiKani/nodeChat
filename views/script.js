@@ -9,6 +9,9 @@ document.querySelector("#rid").textContent = `ルーム：${decodeURIComponent(r
 // メディアプレビュー中
 let isPreview = false
 
+// ローディングオーバーレイのタイムアウトハンドル
+let overlayTimeout = -1
+
 // テキスト入力欄のEnterキーによる送信処理
 function handleTextKeydown(e) {
 	if(e.key === 'Enter') {
@@ -74,6 +77,10 @@ document.querySelector("input[name=file]").addEventListener("change", () => {
 })
 // メディアプレビュー
 function previewMedia() {
+	overlayTimeout = setTimeout(() => {
+		document.querySelector("#overlayLoad").classList.add("show")
+	}, 300)
+	
 	const username = document.querySelector("input[name='username']").value
 	const inputFile = document.querySelector("input[name='file']")
 	const formData = new FormData()
@@ -88,7 +95,8 @@ function previewMedia() {
 	isPreview = true
 
 	fetch("/previewMedia", {method: "POST", body: formData})
-		.then(res => {})
+		.then(res => {
+		})
 		.catch(err => console.error("エラー:", err))
 }
 
@@ -221,6 +229,9 @@ function connect(isRename = false) {
 			media.appendChild(remove)
 			media.appendChild(type)
 			preview.appendChild(media)
+			
+			clearTimeout(overlayTimeout)
+			document.querySelector("#overlayLoad").classList.remove("show")
 		})
 	})
 	
