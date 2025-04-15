@@ -6,6 +6,24 @@ const rid = location.search.split("?")
 	?.at(0)?.at(1)
 document.querySelector("#rid").textContent = `ルーム：${decodeURIComponent(rid)}`
 
+// 元のタイトルを保持
+const originalTitle = document.title
+let msgsOnHidden = 0
+
+// ページの表示状態が変化したときのイベントリスナー
+document.addEventListener('visibilitychange', () => {
+	// アクティブになった（表示状態になった）場合はタイトルをリセット
+	if (!document.hidden) {
+		document.title = originalTitle
+		msgsOnHidden = 0
+	}
+});
+function emitOnHidden() {
+	if (document.hidden) {
+		document.title = `originalTitle [+${++msgsOnHidden}]`
+	}
+}
+
 // メディアプレビュー中
 let isPreview = false
 
@@ -170,16 +188,22 @@ function connect(isRename = false) {
 
 	// サーバーからの更新イベント処理
 	socket.on(`update${rid}${username}`, (data) => {
+		emitOnHidden()
+		
 		const parsedData = JSON.parse(data)
 		updateResponseContainer(parsedData, username)
 	})
 	socket.on(`update${rid}`, (data) => {
+		emitOnHidden()
+		
 		const parsedData = JSON.parse(data)
 		updateResponseContainer(parsedData, username)
 	})
 	
 	// プレビュー
 	socket.on(`preview${rid}${username}`, (data) => {
+		emitOnHidden()
+		
 		const parsedData = JSON.parse(data)
 		const preview = document.querySelector("#preview")
 		preview.classList.add("show")
