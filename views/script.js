@@ -363,7 +363,9 @@ function updateResponseContainer(messageList, currentUsername) {
 			filesDiv.classList.add("item-files")
 			
 			// プレビューを削除
-			document.querySelector(".remove-preview").click()
+			if (isPreview) {
+				document.querySelector(".remove-preview").click()
+			}
 		}
 	})
 //console.timeEnd("set files")
