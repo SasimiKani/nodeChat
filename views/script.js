@@ -90,6 +90,28 @@ function send() {
 	}
 }
 
+// ドラッグドロップ処理
+let msgContainer = document.querySelector("#messageContainer")
+msgContainer.addEventListener("dragover", (e) => {
+	e.preventDefault()
+	msgContainer.classList.add("dragover")
+})
+msgContainer.addEventListener("dragleave", (e) => {
+	e.preventDefault()
+	msgContainer.classList.remove("dragover")
+})
+msgContainer.addEventListener("drop", (e) => {
+	e.preventDefault()
+	msgContainer.classList.remove("dragover")
+	const data = e.dataTransfer
+	const type = data.items[0]?.type
+	if (type.match(/(image|video).*/g)) {
+		const inputFile = document.querySelector("input[name='file']")
+		inputFile.files = data.files
+		previewMedia()
+	}
+})
+
 document.querySelector("input[name=file]").addEventListener("change", () => {
 	previewMedia()
 })

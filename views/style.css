@@ -111,6 +111,11 @@ button[name="rename"] {
 	color: white;
 }
 
+/* ファイルドラッグ */
+#messageContainer.dragover {
+	border: 2px dotted #f00;
+	opacity: .5;
+}
 /* ファイルプレビュー領域 */
 #preview.show {
 	display: none;
