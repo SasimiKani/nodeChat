@@ -13,6 +13,7 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 // 'views'フォルダ内のファイルを静的コンテンツとして公開
 app.use(express.static(path.join(__dirname, "views")));
+app.use(express.static(path.join(__dirname, "uploads")));
 
 let chatData = {}
 let data = []
@@ -57,13 +58,8 @@ const pushData = (reqData, rid=undefined, files=undefined) => new Promise(r => {
 			chain = chain.then(() => 
 				new Promise(async resolve => {
 					const mimetype = file.mimetype
-					const fileBuffer = fs.readFileSync(file.path)
-					const blob = new Blob([fileBuffer], { type: mimetype })
-					
-					const arrayBuffer = await blob.arrayBuffer()
-					const base64FromBlob = Buffer.from(arrayBuffer).toString('base64');
-					const dataUrl = `data:image/png;base64,${base64FromBlob}`;
-					filesSrc.push({src: dataUrl, mimetype: mimetype})
+					const filename = file.filename
+					filesSrc.push({src: filename, mimetype: mimetype})
 					
 					resolve()
 				})
