@@ -20,7 +20,7 @@ document.addEventListener('visibilitychange', () => {
 });
 function emitOnHidden() {
 	if (document.hidden) {
-		document.title = `originalTitle [+${++msgsOnHidden}]`
+		document.title = `${originalTitle} [+${++msgsOnHidden}]`
 	}
 }
 
