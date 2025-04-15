@@ -9,11 +9,11 @@ const path = require("path")
 const fs = require("fs")
 const { Blob } = require('buffer')
 
-app.set('view engine', 'ejs');
-app.use(express.json());
+app.set('view engine', 'ejs')
+app.use(express.json())
 // 'views'フォルダ内のファイルを静的コンテンツとして公開
-app.use(express.static(path.join(__dirname, "views")));
-app.use(express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname, "views")))
+app.use(express.static(path.join(__dirname, "uploads")))
 
 let chatData = {}
 let data = []
@@ -45,36 +45,25 @@ const lastDataFormat = (rid=undefined) => {
 	return JSON.stringify([ Array.from(chatData[rid]?.data)?.reverse()?.at(0) ])
 }
 
-const pushData = (reqData, rid=undefined, files=undefined) => new Promise(r => {
+const getTime = () => {
 	const date = new Date()
 	const hour = `00${date.getHours()}`.slice(-2)
 	const minute = `00${date.getMinutes()}`.slice(-2)
-	const time = `${hour}:${minute}`
+	return `${hour}:${minute}`
+}
+
+const pushData = (reqData, rid=undefined, filesSrc=undefined) => new Promise(r => {
+	const time = getTime()
 	
-	const filesSrc = []
-	if (files) {
-		let chain = Promise.resolve()
-		files.forEach(file => {
-			chain = chain.then(() => 
-				new Promise(async resolve => {
-					const mimetype = file.mimetype
-					const filename = file.filename
-					filesSrc.push({src: filename, mimetype: mimetype})
-					
-					resolve()
-				})
-			)
+	if (filesSrc) {
+		chatData[rid]?.data?.push({
+			time: time,
+			info: reqData?.info,
+			name: reqData?.name,
+			text: reqData?.text,
+			files: filesSrc
 		})
-		chain.then(() => {
-			chatData[rid]?.data?.push({
-				time: time,
-				info: reqData?.info,
-				name: reqData?.name,
-				text: reqData?.text,
-				files: filesSrc
-			})
-			r(`[${time}] 送信：${reqData?.name} text:「${reqData?.text}」 info:「${reqData?.info}」 files:「${filesSrc[0].mimetype}」`)
-		})
+		r(`[${time}] 送信：${reqData?.name} text:「${reqData?.text}」 info:「${reqData?.info}」 filesSrc:「${JSON.stringify(filesSrc)}」`)
 	} else {
 		chatData[rid]?.data?.push({
 			time: time,
@@ -95,14 +84,14 @@ app.post("/sendText", (req, res) => {
 	const rid = req.body.rid
 	pushData({name: req.body.name, text: req.body.text}, rid).then((msg) => {
 		console.log(msg)
-		io.emit(`update${rid}`, lastDataFormat(rid));
+		io.emit(`update${rid}`, lastDataFormat(rid))
 	})
 })
 app.post("/rename", (req, res) => {
 	const rid = req.body.rid
 	pushData({name: req.body.name, info: "名前を変更"}, rid).then((msg) => {
 		console.log(msg)
-		io.emit(`update${rid}`, lastDataFormat(rid));
+		io.emit(`update${rid}`, lastDataFormat(rid))
 	})
 })
 app.post("/previewMedia", upload.any(), (req, res) => {
@@ -123,43 +112,43 @@ app.post("/previewMedia", upload.any(), (req, res) => {
 		)
 	})
 	chain.then(() => {
-		io.emit(`preview${rid}${req.body.name}`, JSON.stringify(filesSrc));
+		io.emit(`preview${rid}${req.body.name}`, JSON.stringify(filesSrc))
 	})
 	
 	
 })
-app.post("/sendMedia", upload.any(), (req, res) => {
+app.post("/sendMedia", (req, res) => {
 	const rid = req.body.rid
-	const files = req.files
-	pushData({name: req.body.name}, rid, files).then((msg) => {
+	const filesSrc = {src: req.body.filename, mimetype: req.body.mimetype}
+	pushData({name: req.body.name}, rid, filesSrc).then((msg) => {
 		console.log(msg)
-		io.emit(`update${rid}`, lastDataFormat(rid));
+		io.emit(`update${rid}`, lastDataFormat(rid))
 	})
 })
 app.post("/Y", (req, res) => {
 	const rid = req.body.rid
 	pushData({name: req.body.name, info: "Yボタン押した"}, rid).then((msg) => {
 		console.log(msg)
-		io.emit(`update${rid}`, dataFormat(rid));
+		io.emit(`update${rid}`, dataFormat(rid))
 	})
 })
 app.get("/reset", (req, res) => {
 	const rid = req.body?.rid
 	chatData[rid].data = chatData[rid]?.data?.filter(a => false)
-	io.emit(`update${rid}`, dataFormat(rid));
+	io.emit(`update${rid}`, dataFormat(rid))
 })
 
 // HTTP サーバーを Express アプリケーションから生成
-const server = http.createServer(app);
+const server = http.createServer(app)
 
 // socket.io サーバーの初期化
-const io = new Server(server);
+const io = new Server(server)
 
 // クライアントの接続を監視する
 io.on("connection", (socket) => {
-	const username = socket.handshake.query.username || "無名";
-	const rid = socket.handshake.query.rid ?? "無名";
-	console.log(`${decodeURIComponent(rid)} に ${username}が入室`);
+	const username = socket.handshake.query.username || "無名"
+	const rid = socket.handshake.query.rid ?? "無名"
+	console.log(`[${getTime()}] ${decodeURIComponent(rid)} に ${username}が入室`)
 	
 	if (!chatData[rid]) {
 		chatData[rid] = {
@@ -174,14 +163,14 @@ io.on("connection", (socket) => {
 	chatData[rid]?.users.push(username)
 	//console.log(JSON.stringify(chatData, null, "\t"))
 	
-	io.emit(`update${rid}${username}`, dataFormat(rid));
-	io.emit(`getUsers${rid}`, chatData[rid]?.users);
+	io.emit(`update${rid}${username}`, dataFormat(rid))
+	io.emit(`getUsers${rid}`, chatData[rid]?.users)
 
 	// 必要に応じて、ここで各種イベントをハンドルする
 	socket.on("disconnect", () => {
-		const username = socket.handshake.query.username ?? "無名";
-		const rid = socket.handshake.query.rid ?? "無名";
-		console.log(`${decodeURIComponent(rid)} から ${username}が退室`);
+		const username = socket.handshake.query.username ?? "無名"
+		const rid = socket.handshake.query.rid ?? "無名"
+		console.log(`[${getTime()}] ${decodeURIComponent(rid)} から ${username}が退室`)
 		
 		// const rid = getRid(req)
 		// pushData({info: `${username}が退室`}, rid)
@@ -191,15 +180,15 @@ io.on("connection", (socket) => {
 			chatData[rid]?.users.splice(index, 1)
 		}
 		
-		io.emit(`update${rid}${username}`, dataFormat(rid));
-		io.emit(`getUsers${rid}`, chatData[rid]?.users);
+		io.emit(`update${rid}${username}`, dataFormat(rid))
+		io.emit(`getUsers${rid}`, chatData[rid]?.users)
 		return
-	});
-});
+	})
+})
 
 // 特定の IP アドレスとポートでサーバーを起動
 const HOST = "172.16.15.37";  // サーバーに割り当てられたLAN内のIPアドレス
-const PORT = 3000;
+const PORT = 3000
 server.listen(PORT, HOST, () => {
-  console.log(`Server is running at http://${HOST}:${PORT}/`);
-});
+  console.log(`Server is running at http://${HOST}:${PORT}/`)
+})

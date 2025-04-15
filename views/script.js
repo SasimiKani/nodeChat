@@ -69,6 +69,9 @@ function send() {
 	}
 }
 
+document.querySelector("input[name=file]").addEventListener("change", () => {
+	previewMedia()
+})
 // メディアプレビュー
 function previewMedia() {
 	const username = document.querySelector("input[name='username']").value
@@ -92,32 +95,27 @@ function previewMedia() {
 // メディア送信処理
 function sendMedia() {
 	const username = document.querySelector("input[name='username']").value
-	const inputFile = document.querySelector("input[name='file']")
+	//const inputFile = document.querySelector("input[name='file']")
+	const filename = document.querySelector("#preview > div").firstChild.src.split("/").pop()
+	const mimetype = document.querySelector("#preview > div").lastChild.value
 	const formData = new FormData()
-	if (inputFile.files === "") return
+	if (filename === "") return
 
-	for (const file of Array.from(inputFile.files)) {
-		formData.append("files", file)
-	}
-	formData.append("name", username)
-	formData.append("rid", rid)
+	const reqBody = postRequestBody()
+	let bodyObj = JSON.parse(reqBody.body)
+	bodyObj.filename = filename
+	bodyObj.mimetype = mimetype
+	reqBody.body = JSON.stringify(bodyObj)
 
 	// 入力欄をクリア
 	inputFile.files = null
-	// プレビューを削除
-	document.querySelector(".remove-preview").click()
 
-	fetch("/sendMedia", {method: "POST", body: formData})
+	fetch("/sendMedia", reqBody)
 		.then(res => response(res))
 		.catch(err => console.error("エラー:", err))
 }
-document.querySelector(`button[name="sendMedia"]`).onclick = sendText 
-document.querySelector("input[name=file]").addEventListener("change", () => {
-	previewMedia()
-//	sendMedia()
-})
-document.querySelector("button[name=rename]").onclick = rename
 
+document.querySelector("button[name=rename]").onclick = rename
 // ユーザー名変更（rename）処理
 function rename() {
 	if(connect(true)) {
@@ -183,7 +181,12 @@ function connect(isRename = false) {
 			const {src, mimetype} = data
 			
 			const media = document.createElement("div")
+			const type = document.createElement("input")
 			const remove = document.createElement("button")
+			
+			type.type = "hidden"
+			type.value = mimetype
+			
 			remove.textContent = "x"
 			remove.classList.add("remove-preview")
 			if(getDeviceType() === "Mobile") {
@@ -216,6 +219,7 @@ function connect(isRename = false) {
 				}
 			}
 			media.appendChild(remove)
+			media.appendChild(type)
 			preview.appendChild(media)
 		})
 	})
@@ -342,25 +346,24 @@ function updateResponseContainer(messageList, currentUsername) {
 	Array.from(messageList).reverse().forEach((row, i) => {
 		const filesDiv = container.children[i].querySelector(".textItem .item-files")
 		if (row.files) {
-			row.files.forEach(file => {
-				const {src, mimetype} = file
-				if (mimetype.match(/image.*/g)) {
-					const img = document.createElement("img")
-					lazyLoadMedia(img, src)
-					//img.src = src
-					filesDiv.appendChild(img)
-				}
-				else if (mimetype.match(/video.*/g)) {
-					const video = document.createElement("video")
-					lazyLoadMedia(video, src)
-					//video.src = src
-					video.controls = true
-					filesDiv.appendChild(video)
-				}
-			})
+			const {src, mimetype} = row.files
+			if (mimetype.match(/image.*/g)) {
+				const img = document.createElement("img")
+				lazyLoadMedia(img, src)
+				filesDiv.appendChild(img)
+			}
+			else if (mimetype.match(/video.*/g)) {
+				const video = document.createElement("video")
+				lazyLoadMedia(video, src)
+				video.controls = true
+				filesDiv.appendChild(video)
+			}
 			
 			filesDiv.classList.add("item")
 			filesDiv.classList.add("item-files")
+			
+			// プレビューを削除
+			document.querySelector(".remove-preview").click()
 		}
 	})
 //console.timeEnd("set files")
