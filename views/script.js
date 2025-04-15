@@ -81,6 +81,7 @@ document.querySelector(`button[name="sendMedia"]`).onclick = sendText
 document.querySelector("input[name=file]").addEventListener("change", () => {
 	sendMedia()
 })
+document.querySelector("button[name=rename]").onclick = rename
 
 // ユーザー名変更（rename）処理
 function rename() {
@@ -194,8 +195,10 @@ function updateResponseContainer(messageList, currentUsername) {
 	const container = document.querySelector("div#responseContainer")
 	
 //	console.log (messageList)
-//	container.innerHTML = ""; // 既存要素のクリア
-
+	if (messageList.length > 1) {
+		container.innerHTML = ""; // 既存要素のクリア
+	}
+	
 //console.time("set div")
 	messageList.forEach(row => {
 		// 各行ごとに表示用コンテナを生成
