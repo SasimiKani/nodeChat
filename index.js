@@ -187,7 +187,7 @@ io.on("connection", (socket) => {
 })
 
 // 特定の IP アドレスとポートでサーバーを起動
-const HOST = "172.16.15.37";  // サーバーに割り当てられたLAN内のIPアドレス
+const HOST = "0.0.0.0";  // サーバーに割り当てられたLAN内のIPアドレス
 const PORT = 3000
 server.listen(PORT, HOST, () => {
   console.log(`Server is running at http://${HOST}:${PORT}/`)
