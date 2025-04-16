@@ -95,10 +95,11 @@ app.post("/rename", (req, res) => {
 	})
 })
 app.post("/previewMedia", upload.any(), (req, res) => {
+	const socketId = req.body.socketId
 	const rid = req.body.rid
 	const files = req.files
 	const filesSrc = []
-	
+
 	let chain = Promise.resolve()
 	files.forEach(file => {
 		chain = chain.then(() => 
@@ -112,7 +113,7 @@ app.post("/previewMedia", upload.any(), (req, res) => {
 		)
 	})
 	chain.then(() => {
-		io.emit(`preview${rid}${req.body.name}`, JSON.stringify(filesSrc))
+		io.emit(`preview${rid}${socketId}`, JSON.stringify(filesSrc))
 	})
 	
 	
@@ -163,7 +164,7 @@ io.on("connection", (socket) => {
 	chatData[rid]?.users.push(username)
 	//console.log(JSON.stringify(chatData, null, "\t"))
 	
-	io.emit(`update${rid}${username}`, dataFormat(rid))
+	io.emit(`update${rid}${socket.id}`, dataFormat(rid))
 	io.emit(`getUsers${rid}`, chatData[rid]?.users)
 
 	// 必要に応じて、ここで各種イベントをハンドルする
@@ -180,7 +181,7 @@ io.on("connection", (socket) => {
 			chatData[rid]?.users.splice(index, 1)
 		}
 		
-		io.emit(`update${rid}${username}`, dataFormat(rid))
+		io.emit(`update${rid}${socket.id}`, dataFormat(rid))
 		io.emit(`getUsers${rid}`, chatData[rid]?.users)
 		return
 	})

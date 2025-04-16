@@ -1,5 +1,6 @@
 // グローバル変数：socket
-let socket
+var socket
+var socketId
 const rid = location.search.split("?")
 	?.map(param => param.split("="))
 	?.filter(param => param[0] === "rid")
@@ -131,6 +132,7 @@ function previewMedia() {
 	}
 	formData.append("name", username)
 	formData.append("rid", rid)
+	formData.append("socketId", socketId)
 
 	isPreview = true
 
@@ -206,100 +208,102 @@ function connect(isRename = false) {
 
 	socket.on("connect", () => {
 		console.log("socket.io 接続完了")
-	})
-
-	// サーバーからの更新イベント処理
-	socket.on(`update${rid}${username}`, (data) => {
-		emitOnHidden()
 		
-		const parsedData = JSON.parse(data)
-		updateResponseContainer(parsedData, username)
-	})
-	socket.on(`update${rid}`, (data) => {
-		emitOnHidden()
-		
-		const parsedData = JSON.parse(data)
-		updateResponseContainer(parsedData, username)
-	})
+		socketId = socket.id
 	
-	// プレビュー
-	socket.on(`preview${rid}${username}`, (data) => {
-		emitOnHidden()
-		
-		const parsedData = JSON.parse(data)
-		const preview = document.querySelector("#preview")
-		preview.classList.add("show")
-		preview.innerHTML = ""
-		
-		parsedData.forEach(data => {
-			const {src, mimetype} = data
+		// サーバーからの更新イベント処理
+		socket.on(`update${rid}${socket.id}`, (data) => {
+			emitOnHidden()
 			
-			const media = document.createElement("div")
-			const type = document.createElement("input")
-			const remove = document.createElement("button")
-			
-			type.type = "hidden"
-			type.value = mimetype
-			
-			remove.textContent = "x"
-			remove.classList.add("remove-preview")
-			if(getDeviceType() === "Mobile") {
-				remove.classList.add("mobi-3")
-			}
-			
-			if (mimetype.match(/image.*/g)) {
-				const img = document.createElement("img")
-				lazyLoadMedia(img, src)
-				media.appendChild(img)
-				
-				remove.onclick = () => {
-					img.remove()
-					remove.remove()
-					preview.classList.remove("show")
-					isPreview = false
-				}
-			}
-			else if (mimetype.match(/video.*/g)) {
-				const video = document.createElement("video")
-				lazyLoadMedia(video, src)
-				video.controls = true
-				media.appendChild(video)
-				
-				remove.onclick = () => {
-					video.remove()
-					remove.remove()
-					preview.classList.remove("show")
-					isPreview = false
-				}
-			}
-			media.appendChild(remove)
-			media.appendChild(type)
-			preview.appendChild(media)
-			
-			clearTimeout(overlayTimeout)
-			document.querySelector("#overlayLoad").classList.remove("show")
+			const parsedData = JSON.parse(data)
+			updateResponseContainer(parsedData, username)
 		})
-	})
-	
+		socket.on(`update${rid}`, (data) => {
+			emitOnHidden()
+			
+			const parsedData = JSON.parse(data)
+			updateResponseContainer(parsedData, username)
+		})
+		
+		// プレビュー
+		socket.on(`preview${rid}${socket.id}`, (data) => {
+			emitOnHidden()
+			
+			const parsedData = JSON.parse(data)
+			const preview = document.querySelector("#preview")
+			preview.classList.add("show")
+			preview.innerHTML = ""
+			
+			parsedData.forEach(data => {
+				const {src, mimetype} = data
+				
+				const media = document.createElement("div")
+				const type = document.createElement("input")
+				const remove = document.createElement("button")
+				
+				type.type = "hidden"
+				type.value = mimetype
+				
+				remove.textContent = "x"
+				remove.classList.add("remove-preview")
+				if(getDeviceType() === "Mobile") {
+					remove.classList.add("mobi-3")
+				}
+				
+				if (mimetype.match(/image.*/g)) {
+					const img = document.createElement("img")
+					lazyLoadMedia(img, src)
+					media.appendChild(img)
+					
+					remove.onclick = () => {
+						img.remove()
+						remove.remove()
+						preview.classList.remove("show")
+						isPreview = false
+					}
+				}
+				else if (mimetype.match(/video.*/g)) {
+					const video = document.createElement("video")
+					lazyLoadMedia(video, src)
+					video.controls = true
+					media.appendChild(video)
+					
+					remove.onclick = () => {
+						video.remove()
+						remove.remove()
+						preview.classList.remove("show")
+						isPreview = false
+					}
+				}
+				media.appendChild(remove)
+				media.appendChild(type)
+				preview.appendChild(media)
+				
+				clearTimeout(overlayTimeout)
+				document.querySelector("#overlayLoad").classList.remove("show")
+			})
+		})
+		
 
-	// サーバーからのユーザー数取得イベント処理
-	socket.on(`getUsers${rid}`, (data) => {
-		document.querySelector("#users").textContent = `部屋の人数：${data.length}人`
-		
-		const userList = document.querySelector("#userList")
-		Array.from(userList.children).forEach(user => user.remove())
-		
-		const head = document.createElement("div")
-		head.textContent = "メンバー"
-		head.classList.add("head")
-		userList.appendChild(head)
-		
-		for (row of data) {
-			const user = document.createElement("div")
-			user.classList.add("user-info")
-			user.textContent = row + (document.querySelector("input[name=username]")?.value === row ? "（自分）" : "")
-			userList.appendChild(user)
-		}
+		// サーバーからのユーザー数取得イベント処理
+		socket.on(`getUsers${rid}`, (data) => {
+			document.querySelector("#users").textContent = `部屋の人数：${data.length}人`
+			
+			const userList = document.querySelector("#userList")
+			Array.from(userList.children).forEach(user => user.remove())
+			
+			const head = document.createElement("div")
+			head.textContent = "メンバー"
+			head.classList.add("head")
+			userList.appendChild(head)
+			
+			for (row of data) {
+				const user = document.createElement("div")
+				user.classList.add("user-info")
+				user.textContent = row + (document.querySelector("input[name=username]")?.value === row ? "（自分）" : "")
+				userList.appendChild(user)
+			}
+		})
 	})
 
 	return true
