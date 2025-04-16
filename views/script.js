@@ -249,7 +249,7 @@ function connect(isRename = false) {
 				if(getDeviceType() === "Mobile") {
 					remove.classList.add("mobi-3")
 				}
-				
+				console.log(mimetype)
 				if (mimetype.match(/image.*/g)) {
 					const img = document.createElement("img")
 					lazyLoadMedia(img, src)
@@ -270,6 +270,19 @@ function connect(isRename = false) {
 					
 					remove.onclick = () => {
 						video.remove()
+						remove.remove()
+						preview.classList.remove("show")
+						isPreview = false
+					}
+				}
+				else if (mimetype.match(/audio.*/g)) {
+					const audio = document.createElement("audio")
+					lazyLoadMedia(audio, src)
+					audio.controls = true
+					media.appendChild(audio)
+					
+					remove.onclick = () => {
+						audio.remove()
 						remove.remove()
 						preview.classList.remove("show")
 						isPreview = false
@@ -418,6 +431,12 @@ function updateResponseContainer(messageList, currentUsername) {
 				lazyLoadMedia(video, src)
 				video.controls = true
 				filesDiv.appendChild(video)
+			}
+			else if (mimetype.match(/audio.*/g)) {
+				const audio = document.createElement("audio")
+				lazyLoadMedia(audio, src)
+				audio.controls = true
+				filesDiv.appendChild(audio)
 			}
 			
 			filesDiv.classList.add("item")
