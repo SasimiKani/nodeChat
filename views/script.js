@@ -249,7 +249,6 @@ function connect(isRename = false) {
 				if(getDeviceType() === "Mobile") {
 					remove.classList.add("mobi-3")
 				}
-				console.log(mimetype)
 				if (mimetype.match(/image.*/g)) {
 					const img = document.createElement("img")
 					lazyLoadMedia(img, src)
@@ -279,6 +278,9 @@ function connect(isRename = false) {
 					const audio = document.createElement("audio")
 					lazyLoadMedia(audio, src)
 					audio.controls = true
+					if(getDeviceType() === "Mobile") {
+						audio.classList.add("mobi-3")
+					}
 					media.appendChild(audio)
 					
 					remove.onclick = () => {
@@ -287,6 +289,7 @@ function connect(isRename = false) {
 						preview.classList.remove("show")
 						isPreview = false
 					}
+					remove.style.transform = "translate(10px, 10px)"
 				}
 				media.appendChild(remove)
 				media.appendChild(type)

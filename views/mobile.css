@@ -22,6 +22,9 @@ label[for="inputFile"].mobi-4 {
 .item.mobi-3 {
 	padding: .5rem 3rem;
 }
+audio.mobi-3 {
+	padding: 1.5rem 0;
+}
 button.remove-preview.mobi-3 {
 	width: 4rem;
 	height: 4rem;
