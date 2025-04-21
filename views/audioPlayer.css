@@ -98,26 +98,3 @@
 .controls .vol {
 	width: 60%;
 }
-
-/* モバイル */
-.mobi-audio.controls {
-	width: 60vw;
-}
-.mobi-audio, .mobi-audio button {
-	width: fit-content;
-	height: fit-content;
-	font-size: 4rem;
-}
-.mobi-audio input[type=range].seek {
-	width: 100%;
-	height: 7rem;
-	border-radius: 3rem;
-}
-.mobi-audio input[type=range].vol {
-	width: 100%;
-	height: 5rem;
-	border-radius: 3rem;
-}
-.mobi-audio .play-time {
-	font-size: 2rem;
-}

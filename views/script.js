@@ -582,10 +582,10 @@ function getDeviceType() {
 document.addEventListener("DOMContentLoaded", () => {
 	if(getDeviceType() === "Mobile") {
 		document.querySelector('#container').classList.add("mobi-100")
-		document.querySelector('#room-info').classList.add("mobi-25")
+		document.querySelector('#room-info').classList.add("mobi-2")
 		document.querySelector('#users').classList.add("mobi-25")
 		document.querySelector("#userList").classList.add("mobi-25")
-		document.querySelector('input[name="username"]').classList.add("mobi-4")
+		document.querySelector('input[name="username"]').classList.add("mobi-3")
 		document.querySelector('label[for="inputFile"]').classList.add("mobi-4")
 		document.querySelector('#response').classList.add("mobi-25")
 		document.querySelector('input[name="text"]').classList.add("mobi-25")

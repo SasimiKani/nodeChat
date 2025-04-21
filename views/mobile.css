@@ -6,31 +6,64 @@
 }
 
 .mobi-4 {
-	font-size: 4rem!important;
+	font-size: 4ex!important;
 }
 label[for="inputFile"].mobi-4 {
-	font-size: 1rem!important;
-	width: 4rem;
+	font-size: 1ex!important;
+	width: 15%;
 }
 
 .mobi-3 {
-	font-size: 3rem!important;
+	font-size: 3ex!important;
 }
 .responseItem .mobi-3, .responseItem-he .mobi-3 {
-	margin: .5rem 0;
+	margin: .5ex 0;
 }
 .item.mobi-3 {
-	padding: .5rem 3rem;
+	padding: .5ex 3ex;
 }
 audio.mobi-3 {
-	padding: 1.5rem 0;
+	padding: 1.5ex 0;
 }
-button.remove-preview.mobi-3 {
-	width: 4rem;
-	height: 4rem;
-	transform: translate(-4.2rem, .2rem);
+button.exove-preview.mobi-3 {
+	width: 4ex;
+	height: 4ex;
+	transform: translate(-4.2ex, .2ex);
 }
 
+input.mobi-25 {
+	width: 65%;
+}
+button.mobi-25 {
+	width: 20%;
+}
 .mobi-25 {
-	font-size: 2.5rem!important;
+	font-size: 2.5ex!important;
+}
+.mobi-2 {
+	font-size: 2ex!important;
+}
+
+
+/* オーディオプレイヤー */
+.mobi-audio.controls {
+	width: 60vw;
+}
+.mobi-audio, .mobi-audio button {
+	width: fit-content;
+	height: fit-content;
+	font-size: 2ex!important;
+}
+.mobi-audio input[type=range].seek {
+	width: 100%;
+	height: 7ex;
+	border-radius: 3ex;
+}
+.mobi-audio input[type=range].vol {
+	width: 60%;
+	height: 5ex;
+	border-radius: 3ex;
+}
+.mobi-audio .play-time {
+	font-size: 2ex;
 }
