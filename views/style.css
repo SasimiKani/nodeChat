@@ -125,14 +125,19 @@ button[name="rename"] {
 	background-color: #efefef;
 	padding: 10px;
 }
-#preview > div {
-}
 #preview > div > img, #preview > div > video {
 	border: 1px solid gray;
 	max-width: 60%;
 	max-height: 40vh;
 	width: auto;    /* 横幅を自動調整 */
 	height: auto;    /* 横幅を自動調整 */
+}
+#preview > div > audio {
+	width: 100%;         /* 親いっぱいに広げる */
+	height: 44px;        /* 既定より少し背を高く */
+	border-radius: 8px;
+	background: #222;    /* コントロールを載せる土台 */
+	box-shadow: 0 2px 6px #0007;
 }
 button.remove-preview {
 	cursor: pointer;
@@ -222,6 +227,13 @@ button.remove-preview {
 	max-height: 30vh;
 	width: auto;    /* 横幅を自動調整 */
 	height: auto;    /* 横幅を自動調整 */
+}
+.item-files audio {
+	width: 100%;         /* 親いっぱいに広げる */
+	height: 44px;        /* 既定より少し背を高く */
+	border-radius: 8px;
+	background: #222;    /* コントロールを載せる土台 */
+	box-shadow: 0 2px 6px #0007;
 }
 .responseItem-he .item-text {
 	background-color: white;

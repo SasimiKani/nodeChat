@@ -1,0 +1,123 @@
+/* 本体を非表示に（ただし音声は再生される） */
+#preview > div > audio { display: none; }
+
+/* ラッパー */
+.player-container {
+	/* 画面幅に応じて 260–480px の間で自動調整 */
+	width: fit-content;
+	background: #222;
+	border-radius: 8px;
+	padding: 8px 12px;
+	box-shadow: 0 2px 8px #0008;
+	color: #fff;
+	font-family: system-ui, sans-serif;
+}
+.mobi-audio.player-container {
+	/* 画面幅に応じて 260–480px の間で自動調整 */
+	padding: 1.5rem 1rem;
+}
+
+/* コントロールエリア */
+.controls{
+	display: flex;
+	flex-direction: column;   /* 2 段組 */
+	gap: .5rem;
+}
+
+.row{
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+}
+
+/*
+.row-main{
+	grid-template-columns: auto 1fr;
+}
+.row-sub{
+	grid-template-columns:  1fr auto;
+}
+*/
+
+/* ボタン */
+.controls button {
+	width: 32px;
+	height: 32px;
+	font-size: 16px;
+	border: none;
+	border-radius: 50%;
+	background: #0000;
+	cursor: pointer;
+}
+.controls button:hover {
+	background: #666;
+}
+
+/* シークバー本体（共通） */
+.controls input[type=range] {
+	/* ❶ “進捗” 用のカスタムプロパティを用意 */
+	--seek-before: 0%;
+  
+	-webkit-appearance:none; appearance:none;
+	/*width:100%;*/
+	height:12px;
+	border-radius:6px;
+	/* ❷ グラデーションで「濃→淡」を合成 */
+	background:linear-gradient(
+			  to right,
+			  #09f 0%          var(--seek-before),
+			  #cee var(--seek-before) 100%
+			);
+	cursor:pointer;
+}
+.controls input[type=range].seek {
+	width: -moz-available;
+	height: 40px;
+}
+.controls input[type=range].vol {
+	height: 10px;
+}
+.controls input[type=range]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 14px;
+	height: 14px;
+	border: none;
+	background: #09f0;
+	cursor: pointer;
+}
+.controls input[type=range]::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	border: none;
+	background: #09f0;
+	cursor: pointer;
+}
+.controls .play-time {
+	width: 40%;
+}
+.controls .vol {
+	width: 60%;
+}
+
+/* モバイル */
+.mobi-audio.controls {
+	width: 60vw;
+}
+.mobi-audio, .mobi-audio button {
+	width: fit-content;
+	height: fit-content;
+	font-size: 4rem;
+}
+.mobi-audio input[type=range].seek {
+	width: 100%;
+	height: 7rem;
+	border-radius: 3rem;
+}
+.mobi-audio input[type=range].vol {
+	width: 100%;
+	height: 5rem;
+	border-radius: 3rem;
+}
+.mobi-audio .play-time {
+	font-size: 2rem;
+}

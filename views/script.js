@@ -263,6 +263,7 @@ function connect(isRename = false) {
 				}
 				else if (mimetype.match(/video.*/g)) {
 					const video = document.createElement("video")
+
 					lazyLoadMedia(video, src)
 					video.controls = true
 					media.appendChild(video)
@@ -275,16 +276,12 @@ function connect(isRename = false) {
 					}
 				}
 				else if (mimetype.match(/audio.*/g)) {
-					const audio = document.createElement("audio")
-					lazyLoadMedia(audio, src)
-					audio.controls = true
-					if(getDeviceType() === "Mobile") {
-						audio.classList.add("mobi-3")
-					}
-					media.appendChild(audio)
-					
+					// カスタムプレイヤー
+					const {player, controls} = createAudio(media, src)
+
 					remove.onclick = () => {
-						audio.remove()
+						player.remove()
+						controls.remove()
 						remove.remove()
 						preview.classList.remove("show")
 						isPreview = false
@@ -300,7 +297,6 @@ function connect(isRename = false) {
 			})
 		})
 		
-
 		// サーバーからのユーザー数取得イベント処理
 		socket.on(`getUsers${rid}`, (data) => {
 			document.querySelector("#users").textContent = `部屋の人数：${data.length}人`
@@ -436,10 +432,8 @@ function updateResponseContainer(messageList, currentUsername) {
 				filesDiv.appendChild(video)
 			}
 			else if (mimetype.match(/audio.*/g)) {
-				const audio = document.createElement("audio")
-				lazyLoadMedia(audio, src)
-				audio.controls = true
-				filesDiv.appendChild(audio)
+				// カスタムプレイヤー
+				createAudio(filesDiv, src)
 			}
 			
 			filesDiv.classList.add("item")
@@ -448,6 +442,8 @@ function updateResponseContainer(messageList, currentUsername) {
 			// プレビューを削除
 			if (isPreview) {
 				document.querySelector(".remove-preview").click()
+				let preview = document.querySelector("#preview > .player-container.mobi-audio")
+				if (preview?.className) preview.className = ""
 			}
 		}
 	})
@@ -472,6 +468,120 @@ function createElem(tag, classNames, text) {
 	classNames.split(" ").forEach(cls => elem.classList.add(cls))
 	elem.textContent = text || ""
 	return elem
+}
+
+function createAudio(parent, src) {
+	// カスタムプレイヤー
+	const player   = document.createElement("audio")
+	const controls   = document.createElement("div")
+	const rowMain   = document.createElement("div")
+	const rowSub   = document.createElement("div")
+	const playBtn = document.createElement("button")
+	const seek    = document.createElement("input")
+	const time    = document.createElement("span")
+	const vol     = document.createElement("input")
+	
+	// メディアソース設定
+	player.src = src
+	
+	// クラス設定
+	parent.classList.add("player-container")
+	controls.classList.add("controls")
+	rowMain.classList.add("row")
+	rowMain.classList.add("row-main")
+	rowSub.classList.add("row")
+	rowSub.classList.add("row-sub")
+	
+	seek.classList.add("seek")
+	vol.classList.add("vol")
+	time.classList.add("play-time")
+	
+	// 属性値設定
+	playBtn.setAttribute("aria-label", "再生/一時停止")
+	playBtn.textContent = "▶️"
+
+	seek.setAttribute("type", "range")
+	seek.setAttribute("value", 0)
+	seek.setAttribute("min", 0)
+	seek.setAttribute("step", 0.1)
+
+	time.textContent = "0:00 / 0:00"
+
+	vol.setAttribute("type", "range")
+	vol.setAttribute("value", 1)
+	vol.setAttribute("min", 0)
+	vol.setAttribute("max", 1)
+	vol.setAttribute("step", 0.01)
+
+	// モバイルクラス
+	if (getDeviceType() == "Mobile") {
+		parent.classList.add("mobi-audio")
+		player.classList.add("mobi-audio")
+		controls.classList.add("mobi-audio")
+	}
+
+	// 要素追加
+	rowMain.appendChild(playBtn)
+	rowMain.appendChild(seek)
+
+	rowSub.appendChild(time)
+	rowSub.appendChild(vol)
+
+	controls.appendChild(rowMain)
+	controls.appendChild(rowSub)
+	
+	parent.appendChild(player)
+	parent.appendChild(controls)
+
+	playBtn.addEventListener('click', () => {
+	  if (player.paused) {
+		player.play()
+		playBtn.textContent = '⏸️'
+	  } else {
+		player.pause()
+		playBtn.textContent = '▶️'
+	  }
+	})
+	
+	// メタデータ取得後にシーク上限を確定
+	player.addEventListener('loadedmetadata', () => {
+	  seek.max = player.duration
+	  updateTime()
+	})
+	
+	/* 進捗を計算して CSS 変数を更新する関数 */
+	const refreshSeek = (seek) =>{
+		const p = 100 * (seek.value / seek.max);          // 0–100
+		seek.style.setProperty('--seek-before', `${p}%`);
+	};
+	
+	// 再生位置が変わったらシークバーと時間を同期
+	player.addEventListener('timeupdate', () => {
+	  seek.value = player.currentTime
+	  updateTime()
+	  refreshSeek(seek);
+	})
+	
+	// シークバー操作
+	seek.addEventListener('input', () => {
+	  player.currentTime = seek.value
+	  refreshSeek(seek)
+	})
+	
+	// 音量操作
+	vol.addEventListener('input', () => {
+	  player.volume = vol.value
+	  refreshSeek(vol)
+	})
+	refreshSeek(vol)
+	
+	// 時間表示を mm:ss 形式で更新
+	function updateTime() {
+	  const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`
+	  time.textContent = `${fmt(player.currentTime)} / ${fmt(player.duration)}`
+	}
+
+	return {player, controls}
 }
 
 // 端末の種類を判定する関数（Mobile/Tablet/Desktop）
