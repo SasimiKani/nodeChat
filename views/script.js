@@ -245,7 +245,13 @@ function connect(isRename = false) {
 				type.value = mimetype
 				
 				remove.textContent = "x"
-				remove.classList.add("remove-preview")
+				remove.classList.add("remove-preview")	
+				remove.onclick = () => {
+					preview.classList.remove("show")
+					preview.firstChild.remove()
+					isPreview = false
+				}
+
 				if(getDeviceType() === "Mobile") {
 					remove.classList.add("mobi-3")
 				}
@@ -253,13 +259,6 @@ function connect(isRename = false) {
 					const img = document.createElement("img")
 					lazyLoadMedia(img, src)
 					media.appendChild(img)
-					
-					remove.onclick = () => {
-						img.remove()
-						remove.remove()
-						preview.classList.remove("show")
-						isPreview = false
-					}
 				}
 				else if (mimetype.match(/video.*/g)) {
 					const video = document.createElement("video")
@@ -267,25 +266,10 @@ function connect(isRename = false) {
 					lazyLoadMedia(video, src)
 					video.controls = true
 					media.appendChild(video)
-					
-					remove.onclick = () => {
-						video.remove()
-						remove.remove()
-						preview.classList.remove("show")
-						isPreview = false
-					}
 				}
 				else if (mimetype.match(/audio.*/g)) {
 					// カスタムプレイヤー
 					const {player, controls} = createAudio(media, src)
-
-					remove.onclick = () => {
-						player.remove()
-						controls.remove()
-						remove.remove()
-						preview.classList.remove("show")
-						isPreview = false
-					}
 					remove.style.transform = "translate(10px, 10px)"
 				}
 				media.appendChild(remove)
@@ -442,8 +426,6 @@ function updateResponseContainer(messageList, currentUsername) {
 			// プレビューを削除
 			if (isPreview) {
 				document.querySelector(".remove-preview").click()
-				let preview = document.querySelector("#preview > .player-container.mobi-audio")
-				if (preview?.className) preview.className = ""
 			}
 		}
 	})
