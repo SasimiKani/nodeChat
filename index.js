@@ -1,4 +1,5 @@
 const express = require("express")
+const cors = require('cors');
 const multer = require("multer")
 const upload = multer({ dest: 'uploads/' })
 const http = require("http");				// HTTP サーバーを作成するために必要
@@ -14,6 +15,21 @@ app.use(express.json())
 // 'views'フォルダ内のファイルを静的コンテンツとして公開
 app.use(express.static(path.join(__dirname, "views")))
 app.use(express.static(path.join(__dirname, "uploads")))
+
+// ―― CORS 設定 ――――――――――――――――――――――――――――――――――――――――
+//   ・origin   : 許可するオリジン（'*' は何でも OK）
+//   ・methods  : 許可する HTTP メソッド
+//   ・allowedHeaders: カスタムヘッダを使うなら追加
+//   ・credentials  : Cookie／認証ヘッダを送るなら true
+// -------------------------------------------------------
+app.use(
+	cors({
+	  origin: ['https://sasimikani.github.io', 'http://127.0.0.1:8000'],              // 例: 'https://example.com' に限定しても可
+	  methods: ['GET'],         // GET だけ許可
+	  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
+	  optionsSuccessStatus: 204 // プリフライト応答のステータス
+	})
+  );
 
 let chatData = {}
 let data = []
@@ -137,6 +153,11 @@ app.get("/reset", (req, res) => {
 	const rid = req.body?.rid
 	chatData[rid].data = chatData[rid]?.data?.filter(a => false)
 	io.emit(`update${rid}`, dataFormat(rid))
+})
+
+app.get("/roomList", (req, res) => {
+	const roomList = Object.keys(chatData)
+	res.send(roomList)
 })
 
 // HTTP サーバーを Express アプリケーションから生成

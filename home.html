@@ -29,6 +29,17 @@
 			color: red;
 		}
 
+		#rid {
+			display: block;
+			text-align: center;
+			padding: 15px 0;
+			border-radius: 4px;
+		}
+		#rid input {
+			width: 100%;
+			font-size: 18px;
+		}
+
 		/* チャットルーム作成ボタンのスタイル */
 		#makeRoom {
 			display: block;
@@ -57,19 +68,45 @@
 			<p>チャット画面左上のルームIDをクリック/タップするとURLをコピーできます</p>
 			<p class="caution">※すべてのチャット履歴は毎日0時に消去されます</p>
 		</div>
+		<div id="rid">
+			<input placeholder="ルームID（未入力はランダム）">
+		</div>
 		<div id="makeRoom" onclick="makeRoom()">
 			チャットルーム作成
 		</div>
 	</div>
 	<script>
-	function makeRoom() {
+	async function getExistRid() {
+		return await fetch("https://nodechat-9dv7.onrender.com/roomList")
+			.then(res => res.text())
+			.then(text => JSON.parse(text)) 
+	}
+
+	function ridGen() {
 		const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 		const rand = () => {
 			return charset[Math.round(Math.random() * charset.length)]
 		}
-		const rid = Array.from({length: 40}, () => rand()).join("")
-		const url = `https:\/\/nodechat-9dv7.onrender.com?rid=${rid}`
-		window.open(url)
+		rid = Array.from({length: 40}, () => rand()).join("")
+		return rid
+	}
+	
+	function makeRoom() {
+		getExistRid().then(ridList => {
+			let rid = document.querySelector("#rid input").value
+			if (ridList.includes(rid)) {
+				alert("そのルームIDはすでに使われています")
+				return false
+			}
+	
+			if (!rid) {
+				do {
+					rid = ridGen()
+				} while (ridList.includes(rid))
+			}
+			const url = `https:\/\/nodechat-9dv7.onrender.com?rid=${rid}`
+			window.open(url)
+		})
 	}
 	
 	function getDeviceType() {
