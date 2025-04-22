@@ -370,7 +370,7 @@ function updateResponseContainer(messageList, currentUsername) {
 			timeDiv.classList.add("mobi-25")
 			infoDiv.classList.add("mobi-25")
 			nameDiv.classList.add("mobi-25")
-			textDiv.classList.add("mobi-3")
+			textDiv.classList.add("mobi-25")
 		}
 
 		// テキスト部分（名前と本文）の生成
