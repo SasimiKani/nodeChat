@@ -8,13 +8,14 @@ const app = express()
 
 const path = require("path")
 const fs = require("fs")
+const fileType = require('file-type');
 const { Blob } = require('buffer')
 
 app.set('view engine', 'ejs')
 app.use(express.json())
 // 'views'フォルダ内のファイルを静的コンテンツとして公開
 app.use(express.static(path.join(__dirname, "views")))
-app.use(express.static(path.join(__dirname, "uploads")))
+//app.use(express.static(path.join(__dirname, "uploads")))
 
 // ―― CORS 設定 ――――――――――――――――――――――――――――――――――――――――
 //   ・origin   : 許可するオリジン（'*' は何でも OK）
@@ -96,6 +97,24 @@ app.get("/", (req, res) => {
 	res.status(200).render("index")
 })
 
+//const uploadFileList = fs.readdirSync(path.join(__dirname, "uploads"))
+//console.log(uploadFileList)
+app.get('/:filename', (req, res) => {
+	const filename = req.params.filename;
+	const buffer = fs.readFileSync(path.join(__dirname, "uploads", filename))
+
+	fileType.fromBuffer(buffer).then(result => {
+		if (result) {
+			res.header({"Content-Type": result.mime})
+			res.send(buffer);
+		} else {
+			console.log('MIME type 判定できませんでした')
+			res.status(500).send("MIME type 判定できませんでした");
+		}
+	})
+
+});
+
 app.post("/sendText", (req, res) => {
 	const rid = req.body.rid
 	pushData({name: req.body.name, text: req.body.text}, rid).then((msg) => {
@@ -131,8 +150,6 @@ app.post("/previewMedia", upload.any(), (req, res) => {
 	chain.then(() => {
 		io.emit(`preview${rid}${socketId}`, JSON.stringify(filesSrc))
 	})
-	
-	
 })
 app.post("/sendMedia", (req, res) => {
 	const rid = req.body.rid
@@ -169,7 +186,7 @@ const io = new Server(server)
 // クライアントの接続を監視する
 io.on("connection", (socket) => {
 	const username = socket.handshake.query.username || "無名"
-	const rid = socket.handshake.query.rid ?? "無名"
+	const rid = socket.handshake.query.rid || "無名"
 	console.log(`[${getTime()}] ${decodeURIComponent(rid)} に ${username}が入室`)
 	
 	if (!chatData[rid]) {
@@ -190,8 +207,8 @@ io.on("connection", (socket) => {
 
 	// 必要に応じて、ここで各種イベントをハンドルする
 	socket.on("disconnect", () => {
-		const username = socket.handshake.query.username ?? "無名"
-		const rid = socket.handshake.query.rid ?? "無名"
+		const username = socket.handshake.query.username || "無名"
+		const rid = socket.handshake.query.rid || "無名"
 		console.log(`[${getTime()}] ${decodeURIComponent(rid)} から ${username}が退室`)
 		
 		// const rid = getRid(req)
