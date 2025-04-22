@@ -186,7 +186,7 @@ button.remove-preview {
 .item {
 	padding: .2rem 1rem;
 	border: 1px solid black;
-	border-radius: 5rem;
+	border-radius: 1rem;
 	margin: 0 5px;
 }
 .item-time {
@@ -198,6 +198,7 @@ button.remove-preview {
 }
 .textItem {
 	display: flex;
+	max-width: 60%;
 	flex-flow: column;
 	align-items: end;
 }
@@ -211,6 +212,9 @@ button.remove-preview {
 .item-text {
 	background-color: green;
 	color: white;
+	width: fit-content;
+	line-height: 1.1em;
+	overflow-wrap: anywhere;
 }
 .item-files {
 	display: flex;

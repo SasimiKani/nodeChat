@@ -4,6 +4,11 @@
 	max-width: 100%!important;
 	width: 100%!important;
 }
+.textItem.mobi-100 {
+	max-width: 80%!important;
+}
+.item-files.item.mobi-100 {
+}
 
 .mobi-4 {
 	font-size: 4ex!important;
@@ -40,8 +45,12 @@ button.mobi-25 {
 .mobi-25 {
 	font-size: 2.5ex!important;
 }
+
 .mobi-2 {
 	font-size: 2ex!important;
+}
+.mobi-15 {
+	font-size: 1.5ex!important;
 }
 
 

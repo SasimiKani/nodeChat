@@ -365,14 +365,6 @@ function updateResponseContainer(messageList, currentUsername) {
 			filesDiv.classList.add("item-files-he")
 		}
 
-		// Mobile用のクラス追加処理
-		if(getDeviceType() === "Mobile") {
-			timeDiv.classList.add("mobi-25")
-			infoDiv.classList.add("mobi-25")
-			nameDiv.classList.add("mobi-25")
-			textDiv.classList.add("mobi-25")
-		}
-
 		// テキスト部分（名前と本文）の生成
 		const textItem = document.createElement("div")
 		textItem.classList.add("textItem")
@@ -385,6 +377,16 @@ function updateResponseContainer(messageList, currentUsername) {
 			textItem.appendChild(filesDiv)
 		}
 		
+		// Mobile用のクラス追加処理
+		if(getDeviceType() === "Mobile") {
+			textItem.classList.add("mobi-100")
+			timeDiv.classList.add("mobi-25")
+			infoDiv.classList.add("mobi-25")
+			nameDiv.classList.add("mobi-25")
+			textDiv.classList.add("mobi-2")
+			filesDiv.classList.add("mobi-100")
+		}
+
 		if(row?.time) {
 			textItem.appendChild(timeDiv)
 		}
@@ -585,11 +587,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		document.querySelector('#room-info').classList.add("mobi-2")
 		document.querySelector('#users').classList.add("mobi-25")
 		document.querySelector("#userList").classList.add("mobi-25")
-		document.querySelector('input[name="username"]').classList.add("mobi-3")
-		document.querySelector('label[for="inputFile"]').classList.add("mobi-4")
+		document.querySelector('input[name="username"]').classList.add("mobi-25")
+		document.querySelector('label[for="inputFile"]').classList.add("mobi-35")
 		document.querySelector('#response').classList.add("mobi-25")
 		document.querySelector('input[name="text"]').classList.add("mobi-25")
-		document.querySelector('button[name="sendText"]').classList.add("mobi-25")
+		document.querySelector('button[name="sendText"]').classList.add("mobi-2")
 	}
 	connect()
 })
