@@ -112,6 +112,17 @@ msgContainer.addEventListener("drop", (e) => {
 		previewMedia()
 	}
 })
+msgContainer.addEventListener("paste", (e) => {const items = event.clipboardData.items;
+	for (const item of items) {
+		if (item.kind === "file" && item.type.startsWith("image/")) {
+			const file = item.getAsFile()
+			console.log("取得した画像ファイル:", file)
+			//const files = FileList(file)
+			//files.add(file)
+			//document.querySelector("input[name=file]").files = files
+		}
+	}
+})
 
 document.querySelector("input[name=file]").addEventListener("change", () => {
 	previewMedia()
