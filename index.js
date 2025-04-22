@@ -97,24 +97,6 @@ app.get("/", (req, res) => {
 	res.status(200).render("index")
 })
 
-//const uploadFileList = fs.readdirSync(path.join(__dirname, "uploads"))
-//console.log(uploadFileList)
-app.get('/:filename', (req, res) => {
-	const filename = req.params.filename;
-	const buffer = fs.readFileSync(path.join(__dirname, "uploads", filename))
-
-	fileType.fromBuffer(buffer).then(result => {
-		if (result) {
-			res.header({"Content-Type": result.mime})
-			res.send(buffer);
-		} else {
-			console.log('MIME type 判定できませんでした')
-			res.status(500).send("MIME type 判定できませんでした");
-		}
-	})
-
-});
-
 app.post("/sendText", (req, res) => {
 	const rid = req.body.rid
 	pushData({name: req.body.name, text: req.body.text}, rid).then((msg) => {
@@ -176,6 +158,24 @@ app.get("/roomList", (req, res) => {
 	const roomList = Object.keys(chatData)
 	res.send(roomList)
 })
+
+//const uploadFileList = fs.readdirSync(path.join(__dirname, "uploads"))
+//console.log(uploadFileList)
+app.get('/:filename', (req, res) => {
+	const filename = req.params.filename;
+	const buffer = fs.readFileSync(path.join(__dirname, "uploads", filename))
+
+	fileType.fromBuffer(buffer).then(result => {
+		if (result) {
+			res.header({"Content-Type": result.mime})
+			res.send(buffer);
+		} else {
+			console.log('MIME type 判定できませんでした')
+			res.status(500).send("MIME type 判定できませんでした");
+		}
+	})
+
+});
 
 // HTTP サーバーを Express アプリケーションから生成
 const server = http.createServer(app)
