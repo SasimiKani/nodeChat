@@ -28,6 +28,11 @@
 		#description .caution {
 			color: red;
 		}
+		@media (pointer:coarse) and (hover:none) {
+			#description {
+				font-size: 1.2rem !important;
+			}
+		}
 
 		#rid {
 			display: block;
@@ -38,6 +43,11 @@
 		#rid input {
 			width: 100%;
 			font-size: 18px;
+		}
+		@media (pointer:coarse) and (hover:none) {
+			#rid input {
+				font-size: 1.3rem !important;
+			}
 		}
 
 		/* チャットルーム作成ボタンのスタイル */
@@ -53,6 +63,11 @@
 			font-weight: bold;
 			transition: background-color 0.3s ease;
 			user-select: none;
+		}
+		@media (pointer:coarse) and (hover:none) {
+			#makeRoom {
+				font-size: 1.5rem !important;
+			}
 		}
 
 		/* ホバー時の背景色変更 */
@@ -97,7 +112,7 @@
 		<div id="description">
 			<p>チャットルーム作成ボタンを押すと新しいチャットルームが作成されます</p>
 			<p>チャット画面左上のルームIDをクリック/タップするとURLをコピーできます</p>
-			<p class="caution">※すべてのチャット履歴は毎日0時に消去されます</p>
+			<p class="caution">※すべてのチャット履歴とアップロードファイルは定期的に自動削除されます</p>
 		</div>
 		<div id="rid">
 			<input placeholder="ルームID（未入力はランダム）">
