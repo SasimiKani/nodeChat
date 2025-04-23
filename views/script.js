@@ -112,14 +112,19 @@ msgContainer.addEventListener("drop", (e) => {
 		previewMedia()
 	}
 })
+
+/**
+ * クリップボードから画像を貼り付け
+ */
 msgContainer.addEventListener("paste", (e) => {const items = event.clipboardData.items;
 	for (const item of items) {
 		if (item.kind === "file" && item.type.startsWith("image/")) {
 			const file = item.getAsFile()
-			console.log("取得した画像ファイル:", file)
-			//const files = FileList(file)
-			//files.add(file)
-			//document.querySelector("input[name=file]").files = files
+			const dataTransfer = new DataTransfer()
+			dataTransfer.items.add(file)
+			const inputFile = document.querySelector("input[name='file']")
+			inputFile.files = dataTransfer.files
+			previewMedia()
 		}
 	}
 })
