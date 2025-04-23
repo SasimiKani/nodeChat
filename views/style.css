@@ -323,7 +323,7 @@ button[name="sendMedia"] {
 	display: flex;
 	flex-flow: row;
 }
-#loadAnimetion {
+#loadAnimation {
 	width: 10rem;    /* スピナーの横幅 */
 	height: 10rem;   /* スピナーの高さ */
 	border: 1rem solid rgba(255, 255, 255, 0.3); /* 薄い白い枠線 */
