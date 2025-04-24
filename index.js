@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, "views")))
 // -------------------------------------------------------
 app.use(
 	cors({
-	  origin: ['https://sasimikani.github.io', 'http://localhost:3001'],              // 例: 'https://example.com' に限定しても可
+	  origin: 'https://sasimikani.github.io',              // 例: 'https://example.com' に限定しても可
 	  methods: ['GET'],         // GET だけ許可
 	  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
 	  optionsSuccessStatus: 204 // プリフライト応答のステータス
