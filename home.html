@@ -114,8 +114,8 @@
 		const overlay = document.querySelector("#overlayLoad")
 		overlay.classList.add("show")
 		return await new Promise(resolve => {
-			//fetch("https://nodechat-9dv7.onrender.com/roomList")
-			fetch("http://localhost:3000/roomList")
+			fetch("https://nodechat-9dv7.onrender.com/roomList")
+			//fetch("http://localhost:3000/roomList")
 				.then(res => res.text())
 				.then(text => {
 					overlay.classList.remove("show")
