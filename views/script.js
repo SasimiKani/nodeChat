@@ -106,7 +106,7 @@ msgContainer.addEventListener("drop", (e) => {
 	msgContainer.classList.remove("dragover")
 	const data = e.dataTransfer
 	const type = data.items[0]?.type
-	if (type.match(/(image|video).*/g)) {
+	if (type.match(/(image|video|audio).*/g)) {
 		const inputFile = document.querySelector("input[name='file']")
 		inputFile.files = data.files
 		previewMedia()
