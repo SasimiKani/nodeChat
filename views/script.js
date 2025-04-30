@@ -118,7 +118,7 @@ msgContainer.addEventListener("drop", (e) => {
  */
 msgContainer.addEventListener("paste", (e) => {const items = event.clipboardData.items;
 	for (const item of items) {
-		if (item.kind === "file" && item.type.startsWith("image/")) {
+		if (item.kind === "file" && item.type.match(/(image|video|audio).*/g)) {
 			const file = item.getAsFile()
 			const dataTransfer = new DataTransfer()
 			dataTransfer.items.add(file)
